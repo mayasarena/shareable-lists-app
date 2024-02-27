@@ -1,0 +1,30 @@
+CREATE DATABASE tasks;
+
+CREATE TABLE IF NOT EXISTS users (
+    id VARCHAR PRIMARY KEY,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    name VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS lists (
+    id VARCHAR PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    owner_id VARCHAR REFERENCES users(id) ON DELETE CASCADE,
+    shared BOOLEAN DEFAULT FALSE,
+    color VARCHAR(20)
+);
+
+CREATE TABLE IF NOT EXISTS shared_lists (
+    list_id VARCHAR REFERENCES lists(id) ON DELETE CASCADE,
+    user_id VARCHAR REFERENCES users(id) ON DELETE CASCADE,
+    PRIMARY KEY (list_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS tasks (
+    id VARCHAR PRIMARY KEY,
+    list_id VARCHAR REFERENCES lists(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    completed BOOLEAN DEFAULT FALSE,
+    creator_id VARCHAR REFERENCES users(id) ON DELETE CASCADE,
+    last_edited_by VARCHAR REFERENCES users(id)
+);
