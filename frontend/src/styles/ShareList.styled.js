@@ -27,8 +27,8 @@ export const ShareButton = styled.button`
 
 export const UserIcon = styled.div`
     position: relative;
-    width: 40px;
-    height: 40px;
+    width: ${({ size }) => size ? size : '40px'};
+    height: ${({ size }) => size ? size : '40px'};
     border-radius: 50%;
     background-color: ${(props) => props.backgroundcolor};
     color: ${(props) => props.textcolor};

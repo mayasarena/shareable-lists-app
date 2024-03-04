@@ -32,18 +32,23 @@ export const TitleContainer = styled.div`
 export const HeaderContainer = styled.div`
     display: flex;
     justify-content: space-between;
-    align-items: center;;
+    align-items: center;
     padding-top: 50px;
     padding-bottom: 50px;
+    height: 70px;
 `;
 
 export const TaskListContainer = styled.div`
     padding-left: 30px;
     padding-right: 50px;
+    height: calc(100% - 80px);
 `;
 
 export const TasksContainer = styled.div`
-    padding-top: 20px;
+    margin-top: 5px;
+    padding-top: 10px;
+    height: calc(100% - 230px);
+    overflow: auto;
 `;
 
 export const EditListButton = styled.button`

@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
+    margin: 15px;
     border-radius: 3px;
     background-color: #fff;
-    flex: 0 0 30%;
     border-left: 3px solid ${({ color }) => color};
     box-shadow: 0px 0px 14px 1px rgba(0,0,0,0.05); 
 `;

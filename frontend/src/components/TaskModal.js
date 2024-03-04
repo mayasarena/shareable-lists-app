@@ -1,10 +1,12 @@
 import React from 'react';
 import { useState, useContext } from 'react';
-import { useCookies } from 'react-cookie';
 import { DataContext } from '../contexts/DataContext';
 import { UserContext } from '../contexts/UserContext';
+import { Modal, Overlay, TitleContainer, Title, Form, Input, Option, ButtonContainer, DeleteButtonContainer, SubmitButtonContainer, SubmitButton, CancelButton, DeleteButton, InfoContainer, Info, TextContainer } from '../styles/Modal.styled';
+import ReactTimeAgo from 'react-time-ago';
+import { UserIcon } from '../styles/ShareList.styled';
 
-const TaskModal = ({ setShowModal, task, list }) => {
+const TaskModal = ({ setShowModal, task, list, creatorData, editorData }) => {
     const { getLists, getSharedLists } = useContext(DataContext);
     const { user } = useContext(UserContext);
 
@@ -67,29 +69,76 @@ const TaskModal = ({ setShowModal, task, list }) => {
         console.log(taskData)
     }
 
-    return (
-        <div className="overlay">
-            <div className="modal">
-                <div className="form-title-container">
-                    <h3>Edit your task!</h3>
-                    <button onClick={() => setShowModal(false)}>X</button>
-                </div>
+    const backgroundColors = ['#ccfab1', '#f7bece', '#f4d4ff', '#ccffed', '#bbc1fc', '#ffe0bf', '#ebebeb']
+    const textColors = ['#4fb05f', '#b53147', '#7e2f99', '#2c8565', '#3d46a1', '#c77a28', '#b0b0b0']
+  
+    const getTextColor = (backgroundColor) => {
+      const index = backgroundColors.indexOf(backgroundColor);
+      return textColors[index];
+  };
 
-                <form>
-                    <input 
-                        required 
-                        maxLength={30} 
-                        placeholder="Task goes here" 
-                        name="title"
-                        value={taskData.title} 
-                        onChange={handleChange}
-                    />
-                    <br />
-                    <input type="submit" onClick={editTaskData}/>
-                    <button className="delete" onClick={deleteTask}>DELETE</button>
-                </form>
-            </div>
-        </div>
+    return (
+        <Overlay>
+            <Modal>
+                <TitleContainer>
+                    <Title>Edit your task</Title>
+                </TitleContainer>
+                <InfoContainer>
+                    <Info>
+                        <UserIcon 
+                            backgroundcolor={creatorData.color ? creatorData.color : '#ebebeb'}
+                            textcolor={getTextColor(creatorData.color ? creatorData.color : '#ebebeb')}
+                            email={creatorData.email}
+                            size='30px'
+                        >
+                            { creatorData.name[0] } 
+                        </UserIcon>
+                        <TextContainer>
+                        Task created by {creatorData.email === user.email ? 'Me' : creatorData.email} ({creatorData.name}) <ReactTimeAgo date={task.created_date} local='en-US' />
+                        </TextContainer>
+                    </Info>
+                    {task.last_edited_by && editorData.name && (
+                    <Info>
+                        <UserIcon 
+                            backgroundcolor={editorData.color ? editorData.color : '#ebebeb'}
+                            textcolor={getTextColor(editorData.color ? editorData.color : '#ebebeb')}
+                            email={editorData.email}
+                            size='30px'
+                        >
+                            { editorData.name[0] } 
+                        </UserIcon>
+                        <TextContainer>
+                            Last edited by {editorData.email === user.email ? 'Me' : editorData.email} ({editorData.name}){' '}
+                            <ReactTimeAgo date={task.edited_date} local='en-US' />
+                        </TextContainer>
+                    </Info>
+                    )}
+                </InfoContainer>
+                <Form onSubmit={editTaskData}>
+                    <Option>
+                        Title:
+                        <Input 
+                            required 
+                            maxLength={30} 
+                            placeholder="Task goes here" 
+                            name="title"
+                            value={taskData.title} 
+                            onChange={handleChange}
+                        />
+                    </Option>
+
+                    <ButtonContainer>
+                        <DeleteButtonContainer>
+                            <DeleteButton onClick={deleteTask}>Delete</DeleteButton>
+                        </DeleteButtonContainer>
+                        <SubmitButtonContainer>
+                            <CancelButton onClick={() => setShowModal(false)}>Cancel</CancelButton>
+                            <SubmitButton type="submit" value="Okay" />
+                        </SubmitButtonContainer>
+                    </ButtonContainer>
+                </Form>
+            </Modal>
+        </Overlay>
     );
 }
 

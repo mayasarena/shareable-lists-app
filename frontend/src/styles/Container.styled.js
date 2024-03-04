@@ -31,11 +31,13 @@ export const AppContainer = styled.div`
     display: flex;
     width: 100vw;
     height: 100vh;
+    font-family: 'Poppins', sans-serif;
 `;
 
 export const ContentContainer = styled.div`
     background-color: ${({ backgroundcolor }) => backgroundcolor};
     width: 100%;
+    height: 100%;
 `;
 
 export const HeaderContainer = styled.div`
@@ -46,7 +48,8 @@ export const HeaderContainer = styled.div`
     align-items: center;
     font-size: 25px;
     font-weight: 600;
-    padding: 20px 50px 20px 50px;
+    padding: 0px 50px 0px 50px;
+    height: 70px;
 `;
 
 export const ButtonContainer = styled.div`
@@ -55,10 +58,7 @@ export const ButtonContainer = styled.div`
 `;
 
 export const DashboardContainer = styled.div`
-    display: flex;
-    width: 100%;
-    gap: 20px;
-    padding: 40px;
-    flex-wrap: wrap;
-    justify-content: left;
+    height: calc(100% - 90px);
+    overflow: auto;
+    padding: 10px;
 `;

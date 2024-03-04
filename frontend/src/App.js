@@ -7,7 +7,7 @@ import Sidebar from './components/Sidebar';
 import './index.css';
 import { DataContext } from './contexts/DataContext';
 import { UserContext } from './contexts/UserContext';
-import { AppContainer, CenteredContainer, ContentContainer } from './styles/Container.styled';
+import { AppContainer, CenteredContainer, ContentContainer, DashboardContainer } from './styles/Container.styled';
 import Dashboard from './components/Dashboard';
 
 const App = () => {
@@ -43,9 +43,9 @@ const App = () => {
           {selectedList ? (
             <TaskList key={selectedList.id} list={selectedList} tasks={selectedList.tasks} />
           ) : (
-            <>
+            <DashboardContainer>
               <Dashboard setSelectedList={setSelectedList}/>
-            </>
+            </DashboardContainer>
           )}
         </ContentContainer>
       </AppContainer>

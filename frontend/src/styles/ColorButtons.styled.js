@@ -6,11 +6,10 @@ export const ColorButton = styled.button`
   height: 20px;
   border-radius: 50%;
   border: none;
-  margin-right: 10px;
   cursor: pointer;
 
   &:hover {
-    border: 1px solid grey;
+    border: 1px solid black;
   }
 `;
 
@@ -19,11 +18,16 @@ export const ColorButtonSelected = styled.button`
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 1px solid grey;
-  margin-right: 10px;
+  border: 1px solid black;
   cursor: pointer;
 
   &:hover {
-    border: 1px solid grey;
+    border: 1px solid black;
   }
+`;
+
+export const ColorOptionsContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
 `;

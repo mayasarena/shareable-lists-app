@@ -2,15 +2,15 @@ import React, { useEffect } from 'react';
 import { useState, useContext } from 'react';
 import { DataContext } from '../contexts/DataContext';
 import { UserContext } from '../contexts/UserContext';
-import styled from 'styled-components';
-import { ColorButton, ColorButtonSelected } from '../styles/ColorButtons.styled';
+import { ColorButton, ColorButtonSelected, ColorOptionsContainer } from '../styles/ColorButtons.styled';
+import { Overlay, Modal, TitleContainer, CancelButton, Title, Option, Form, Input, SubmitButton, ButtonContainer, DeleteButton, DeleteButtonContainer, SubmitButtonContainer } from '../styles/Modal.styled';
 
 // The modal for editing or adding a list
 const ListModal = ({ mode, setShowModal, list }) => {
     const editMode = mode === 'edit' ? true : false
     const { getLists } = useContext(DataContext);
     const { user } = useContext(UserContext);
-    const [selectedColor, setSelectedColor] = useState('');
+    const [selectedColor, setSelectedColor] = useState(list ? list.color : '');
     const listColors = ['#f23a4d', '#f2843a', '#fcd049', '#0fb858', '#277be8', '#8f5cc4'];
 
     const [listData, setListData] = useState({
@@ -107,49 +107,57 @@ const ListModal = ({ mode, setShowModal, list }) => {
     }, [selectedColor]);
 
     return (
-        <div className="overlay">
-            <div className="modal">
-                <div className="form-title-container">
-                    <h3>{mode} your list!</h3>
-                    <button onClick={() => setShowModal(false)}>X</button>
-                </div>
-                <>
-                <p>Select a color:</p>
-                <div>
-                {listColors.map(color => (
-                    color === selectedColor ? ( 
-                    <ColorButtonSelected
-                        key={color}
-                        color={color}
-                        onClick={() => setSelectedColor(color)}
-                        style={{ backgroundColor: color }}
-                    />
-                    ) : (
-                    <ColorButton
-                    key={color}
-                    color={color}
-                    onClick={() => setSelectedColor(color)}
-                    style={{ backgroundColor: color }}
-                    />
-                    )
-                ))}
-                </div>
-                </>
-                <form onSubmit={editMode ? editListData : postListData}>
-                    <input 
-                        required 
-                        maxLength={30} 
-                        placeholder="List name goes here" 
-                        name="title"
-                        value={listData.title} 
-                        onChange={handleChange}
-                    />
-                    <br />
-                    <input type="submit" value="Submit" />
-                    {editMode && <button onClick={deleteList}>DELETE LIST</button>}
-                </form>
-            </div>
-        </div>
+        <Overlay>
+            <Modal>
+                <TitleContainer>
+                    <Title>{mode} your list</Title>
+                </TitleContainer>
+                    <Form onSubmit={editMode ? editListData : postListData}>
+                        <Option>
+                            Name:
+                            <Input 
+                            required 
+                            maxLength={30} 
+                            placeholder="List name goes here" 
+                            name="title"
+                            value={listData.title} 
+                            onChange={handleChange}
+                            />
+                        </Option>
+                        <Option>
+                            Color:
+                            <ColorOptionsContainer>
+                            {listColors.map(color => (
+                                color === selectedColor ? ( 
+                                <ColorButtonSelected
+                                    key={color}
+                                    color={color}
+                                    onClick={() => setSelectedColor(color)}
+                                    style={{ backgroundColor: color }}
+                                />
+                                ) : (
+                                <ColorButton
+                                key={color}
+                                color={color}
+                                onClick={() => setSelectedColor(color)}
+                                style={{ backgroundColor: color }}
+                                />
+                                )
+                            ))}
+                            </ColorOptionsContainer>
+                        </Option>
+                        <ButtonContainer>
+                            <DeleteButtonContainer>
+                                {editMode && <DeleteButton onClick={deleteList}>Delete</DeleteButton>}
+                            </DeleteButtonContainer>
+                            <SubmitButtonContainer>
+                                <CancelButton onClick={() => setShowModal(false)}>Cancel</CancelButton>
+                                <SubmitButton type="submit" value="Okay" />
+                            </SubmitButtonContainer>
+                        </ButtonContainer>
+                </Form>
+            </Modal>
+        </Overlay>
     );
 }
 

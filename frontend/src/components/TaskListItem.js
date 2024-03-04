@@ -76,7 +76,7 @@ const TaskListItem = ({ list, task}) => {
             <TaskTitle>{task.title}</TaskTitle>
             <TaskInfo>{task.last_edited_by && editorData.name ? (
               <>
-                Last edited by {editorData.email} ({editorData.name}){' '}
+                Last edited by {editorData.email === user.email ? 'Me' : editorData.email} ({editorData.name}){' '}
                 <ReactTimeAgo date={task.edited_date} local='en-US' />
               </>
               ) : (
@@ -99,7 +99,7 @@ const TaskListItem = ({ list, task}) => {
         )}
         <EditButton onClick={() => setShowModal(true)}><FontAwesomeIcon icon={faEllipsis} /></EditButton>
       </EditContainer>
-      {showModal && <TaskModal mode='edit' setShowModal={setShowModal} task={task}/>}
+      {showModal && <TaskModal mode='edit' setShowModal={setShowModal} task={task} creatorData={creatorData} editorData={editorData}/>}
     </Item>
   );
 }
