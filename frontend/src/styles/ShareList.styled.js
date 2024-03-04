@@ -4,22 +4,23 @@ export const ShareListContainer = styled.div`
     display: flex;
     gap: 5px;
     align-items: center;
-    padding-right: 100px;
+    padding-right: 20px;
 `;
 
 export const ShareButton = styled.button`
-    background-color: #efedf7;
+    background-color: #f2f2f2;
     border: none;
     height: 30px;
     padding-left: 15px;
     padding-right: 15px;
     border-radius: 15px;
     margin-left: 10px;
-    color: #312857;
+    color: #2d7dfc;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 
     &:hover {
-        background-color: #312857;
+        background-color: #2d7dfc;
         color: white;
     }
 `;

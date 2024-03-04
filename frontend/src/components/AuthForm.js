@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 import { auth } from '../firebase';
 import { AuthContainer } from '../styles/Container.styled';
-
+import { ColorButton, ColorButtonSelected } from '../styles/ColorButtons.styled';
 
 const AuthForm = () => {
   const [isLogIn, setIsLogIn] = useState(true);
@@ -12,6 +12,8 @@ const AuthForm = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
+  const [selectedColor, setSelectedColor] = useState('');
+  const userColors = ['#f7bece','#ffe0bf', '#ccfab1','#ccffed', '#bbc1fc', '#f4d4ff'];
 
   const viewLogIn = (status) => {
     setError(null);
@@ -56,7 +58,8 @@ const AuthForm = () => {
         body: JSON.stringify({
           id: userCredential.user.uid,
           email: email,
-          name: displayName
+          name: displayName,
+          color: selectedColor
         })
       });
       if (!response.ok) {
@@ -79,6 +82,30 @@ const AuthForm = () => {
       <form onSubmit={isLogIn ? logIn : signUp}>
         {isLogIn ? <h1>Login</h1> : <h1>Sign up</h1>}
         {!isLogIn && <input type="text" placeholder="Enter your name" value={displayName} onChange={(e) => setDisplayName(e.target.value)}></input>}
+        {!isLogIn && (
+          <>
+            <p>Select a color:</p>
+            <div>
+              {userColors.map(color => (
+                color === selectedColor ? ( 
+                  <ColorButtonSelected
+                    key={color}
+                    color={color}
+                    onClick={() => setSelectedColor(color)}
+                    style={{ backgroundColor: color }}
+                  />
+                ) : (
+                  <ColorButton
+                  key={color}
+                  color={color}
+                  onClick={() => setSelectedColor(color)}
+                  style={{ backgroundColor: color }}
+                  />
+                )
+              ))}
+            </div>
+          </>
+        )}
         <input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)}></input>
         <input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)}></input>'
         {!isLogIn && <input type="password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}></input>}

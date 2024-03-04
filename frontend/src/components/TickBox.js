@@ -1,34 +1,45 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { CheckboxContainer, Checkmark } from '../styles/TickBox.styled';
+import { DataContext } from '../contexts/DataContext';
 
-const TickBox = ({ task }) => {
-  const [completed, setCompleted] = useState(task.completed);
+const TickBox = ({ list, task, margin }) => {
+  const [isChecked, setIsChecked] = useState(task.completed);
+  const { getLists, getSharedLists } = useContext(DataContext);
 
-  const updateCompleted = async () => {
+
+  const updateCompleted = async (e) => {
     try {
-      console.log('id', task.id)
       const response = await fetch(`${process.env.REACT_APP_SERVERURL}/tasks/${task.id}/completed`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ completed: !completed })
+        body: JSON.stringify({ completed: !isChecked })
     });
       if (!response.ok) {
         throw new Error('Failed to update task');
       }
-
-      console.log('successfully updated task completion');
-      setCompleted(!completed);
+      setIsChecked(!isChecked);
+      if (list.shared === true) {
+          getSharedLists();
+      } else {
+          getLists();
+      }
     } catch (error) {
       console.error('Error updating task', error);
     }
   };
 
   return (
-    <div>
-      <button onClick={updateCompleted}>{completed ? 'Completed' : 'Not Completed'}</button>
-    </div>
+    <CheckboxContainer margin={margin}>
+      <input 
+        type="checkbox" 
+        checked={isChecked} 
+        onChange={updateCompleted} 
+      />
+      <Checkmark />
+    </CheckboxContainer>
   );
 }
 

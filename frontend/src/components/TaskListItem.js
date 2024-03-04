@@ -4,35 +4,34 @@ import { useState, useContext, useEffect } from 'react';
 import TaskModal from './TaskModal'
 import { DataContext } from '../contexts/DataContext';
 import { UserContext } from '../contexts/UserContext';
+import { EditButton, EditContainer, TaskInfo, InfoContainer, Item, ItemContainer, TaskTitle } from '../styles/TaskListItem.styled';
+import { UserIcon } from '../styles/ShareList.styled';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
+import ReactTimeAgo from 'react-time-ago';
 
-const TaskListItem = ({task}) => {
+const TaskListItem = ({ list, task}) => {
   const [showModal, setShowModal] = useState(false)
   const { getLists, getSharedLists } = useContext(DataContext);
   const { user } = useContext(UserContext);
   const [creatorData, setCreatorData] = useState({
     email: null,
-    name: null
+    name: null,
+    color: null
   });
   const [editorData, setEditorData] = useState({
     email: null,
-    name: null
+    name: null,
+    color: null
   });
 
-  const deleteTask = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_SERVERURL}/tasks/${task.id}`, {
-        method: 'DELETE'
-      });
-      if (response.ok) {
-        await getLists();
-        await getSharedLists();
-      } else {
-        console.error(`Error deleting task: ${response.statusText}`);
-      }
-    } catch (error) {
-      console.error('Error deleting task:', error);
-    }
-  }
+  const backgroundColors = ['#ccfab1', '#f7bece', '#f4d4ff', '#ccffed', '#bbc1fc', '#ffe0bf', '#ebebeb']
+  const textColors = ['#4fb05f', '#b53147', '#7e2f99', '#2c8565', '#3d46a1', '#c77a28', '#b0b0b0']
+
+  const getTextColor = (backgroundColor) => {
+    const index = backgroundColors.indexOf(backgroundColor);
+    return textColors[index];
+};
 
   const fetchUserData = async () => {
     try {
@@ -41,7 +40,8 @@ const TaskListItem = ({task}) => {
         const userData = await creatorResponse.json();
         setCreatorData({ 
           email: userData.email, 
-          name: userData.name 
+          name: userData.name,
+          color: userData.color
         });
       } else {
         console.error('Error fetching creator user data:', creatorResponse.statusText);
@@ -52,7 +52,8 @@ const TaskListItem = ({task}) => {
           const userData = await editorResponse.json();
           setEditorData({ 
             email: userData.email, 
-            name: userData.name 
+            name: userData.name,
+            color: userData.color
           });
         } else {
           console.error('Error fetching creator user data:', editorResponse.statusText);
@@ -68,20 +69,38 @@ const TaskListItem = ({task}) => {
   }, [task]);
 
   return (
-    <li className="task-list-item">
-      <TickBox task={task} />
-      <div className="info-container">
-        <p className="task-title">{task.title}</p>
-        <p> - Created by {creatorData.name}</p>
-        {task.last_edited_by && <p> - Last edited by {editorData.name}</p>}
-      </div>
+    <Item>
+      <ItemContainer>
+          <TickBox list={list} task={task} margin={'41px'}/>
+          <InfoContainer>
+            <TaskTitle>{task.title}</TaskTitle>
+            <TaskInfo>{task.last_edited_by && editorData.name ? (
+              <>
+                Last edited by {editorData.email} ({editorData.name}){' '}
+                <ReactTimeAgo date={task.edited_date} local='en-US' />
+              </>
+              ) : (
+                <>
+                  Created <ReactTimeAgo date={task.created_date} local='en-US' />
+                </>
+              )}</TaskInfo>
+          </InfoContainer>
+      </ItemContainer>
 
-      <div className="button-container">
-        <button className="edit" onClick={() => setShowModal(true)}>EDIT</button>
-        <button className="delete" onClick={deleteTask}>DELETE</button>
-      </div>
+      <EditContainer>
+        {creatorData.name && creatorData.email && (
+            <UserIcon 
+            backgroundcolor={creatorData.color ? creatorData.color : '#ebebeb'}
+            textcolor={getTextColor(creatorData.color ? creatorData.color : '#ebebeb')}
+            email={creatorData.email}
+            >
+            { creatorData.name[0] } 
+          </UserIcon>
+        )}
+        <EditButton onClick={() => setShowModal(true)}><FontAwesomeIcon icon={faEllipsis} /></EditButton>
+      </EditContainer>
       {showModal && <TaskModal mode='edit' setShowModal={setShowModal} task={task}/>}
-    </li>
+    </Item>
   );
 }
 

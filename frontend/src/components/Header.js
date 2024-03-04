@@ -1,7 +1,5 @@
 import React from 'react';
 import { useContext } from 'react';
-import ListModal from './ListModal';
-import { useState } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { ButtonContainer, HeaderContainer } from '../styles/Container.styled';
 import { SignOutButton } from '../styles/Button.styled';
@@ -16,7 +14,7 @@ const Header = () => {
 
   return (
     <HeaderContainer>
-        <p>Hello, {user.displayName}!</p>
+        Hello, {user.displayName}
         <ButtonContainer>
             <SignOutButton onClick={handleLogout}>Signout</SignOutButton>
         </ButtonContainer>

@@ -25,8 +25,8 @@ const ShareList = ({ list }) => {
         fetchSharedUsers();
     }, [list]);
 
-    const backgroundColors = ['#ccfab1', '#f7bece', '#f4d4ff', '#ccffed', '#bbc1fc', '#ffe0bf']
-    const textColors = ['#4fb05f', '#b53147', '#7e2f99', '#2c8565', '#3d46a1', '#c77a28']
+    const backgroundColors = ['#ccfab1', '#f7bece', '#f4d4ff', '#ccffed', '#bbc1fc', '#ffe0bf', '#ebebeb']
+    const textColors = ['#4fb05f', '#b53147', '#7e2f99', '#2c8565', '#3d46a1', '#c77a28', '#b0b0b0']
 
     const getRandomColor = () => {
         const randomIndex = Math.floor(Math.random() * backgroundColors.length);
@@ -46,8 +46,8 @@ const ShareList = ({ list }) => {
                 return (
                     <UserIcon 
                         key={user.id} 
-                        backgroundcolor={randomColor}
-                        textcolor={getTextColor(randomColor)}
+                        backgroundcolor={user.color ? user.color : '#ebebeb'}
+                        textcolor={getTextColor(user.color ? user.color : '#ebebeb')}
                         email={user.email}
                     >
                         { user.name[0] } 

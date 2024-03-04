@@ -8,11 +8,25 @@ import './index.css';
 import { DataContext } from './contexts/DataContext';
 import { UserContext } from './contexts/UserContext';
 import { AppContainer, CenteredContainer, ContentContainer } from './styles/Container.styled';
+import Dashboard from './components/Dashboard';
 
 const App = () => {
-  const { lists, sharedLists } = useContext(DataContext);
   const { user } = useContext(UserContext);
   const [selectedList, setSelectedList] = useState(null);
+  const { lists, sharedLists, getLists, getSharedLists } = useContext(DataContext);
+
+  const allLists = [...(lists || []), ...(sharedLists || [])];
+
+  useEffect(() => {
+    if (allLists && selectedList) {
+      const updatedSelectedList = allLists.find(list => list.id === selectedList.id);
+      console.log('updating selected list');
+      setSelectedList(updatedSelectedList);
+      if (!updatedSelectedList) {
+        setSelectedList(null);
+      }
+    }
+  }, [lists, selectedList, sharedLists]);
 
   return (
     <>
@@ -24,13 +38,13 @@ const App = () => {
       {user && (
         <AppContainer>
         <Sidebar selectedList={selectedList} setSelectedList={setSelectedList} />
-        <ContentContainer>
+        <ContentContainer backgroundcolor={selectedList ? '#fff' : '#f2f2f2'}>
           <Header />
           {selectedList ? (
             <TaskList key={selectedList.id} list={selectedList} tasks={selectedList.tasks} />
           ) : (
             <>
-              Home
+              <Dashboard setSelectedList={setSelectedList}/>
             </>
           )}
         </ContentContainer>

@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import TaskListItem from './TaskListItem';
 import { UserContext } from '../contexts/UserContext';
 import { useContext } from 'react';
-import { ListTitle, TaskListContainer, ListDetails, TitleContainer, HeaderContainer, ListTitleContainer, EditListButton } from '../styles/TaskList.styled';
+import { ListTitle, TaskListContainer, ListDetails, TitleContainer, HeaderContainer, ListTitleContainer, EditListButton, TasksContainer } from '../styles/TaskList.styled';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import AddTask from './AddTask';
@@ -48,21 +48,25 @@ const TaskList = ({ list, tasks }) => {
       <HeaderContainer>
         <TitleContainer>
           <ListTitleContainer>
-            <ListTitle>{ list.title }</ListTitle>
+            <ListTitle color={list.color}>{ list.title } ({tasks.length})</ListTitle>
             {(list.owner_id === user.uid) && 
               <>
                 <EditListButton className="edit" onClick={() => setShowListModal(true)}><FontAwesomeIcon icon={faPenToSquare} /></EditListButton>
               </>
             }
           </ListTitleContainer>
-            <ListDetails>Created by {ownerData.name} ({ownerData.email})</ListDetails>
+            <ListDetails>Created by 
+              {list.owner_id === user.uid ? ' Me ' : ` ${ownerData.name} `} 
+              ({ownerData.email}) on {new Date(list.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</ListDetails>
         </TitleContainer>
         <ShareList list={list}/>
       </HeaderContainer>
-            <AddTask list={list}/>
-        {tasks?.map((task) => <TaskListItem key={task.id} task={task} />)}
-        {showTaskModal && <TaskModal mode={'create'} setShowModal={setShowTaskModal} list={list} />}
-        {showListModal && <ListModal mode={'edit'} setShowModal={setShowListModal} list={list} />}
+        <AddTask list={list}/>
+        <TasksContainer>
+          {tasks?.map((task) => <TaskListItem key={task.id} list={list} task={task} />)}
+          {showTaskModal && <TaskModal mode={'create'} setShowModal={setShowTaskModal} list={list} />}
+          {showListModal && <ListModal mode={'edit'} setShowModal={setShowListModal} list={list} />}
+        </TasksContainer>
     </TaskListContainer>
   );
 }

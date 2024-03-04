@@ -105,11 +105,11 @@ app.get('/tasks/:listID', async (req, res) => {
 
 // create a new list
 app.post('/lists', async (req, res) => {
-    const { owner_id, title, shared, color } = req.body;
+    const { owner_id, title, shared, color, date } = req.body;
     const id = uuidv4();
 
     try {
-        const newList = await pool.query('INSERT INTO lists(id, title, owner_id, shared, color) VALUES($1, $2, $3, $4, $5)', [id, title, owner_id, shared, color]);
+        const newList = await pool.query('INSERT INTO lists(id, title, owner_id, shared, color, date) VALUES($1, $2, $3, $4, $5, $6)', [id, title, owner_id, shared, color, date]);
         res.json(newList);
     } catch (error) {
         console.error('Error creating list:', error)
@@ -119,11 +119,11 @@ app.post('/lists', async (req, res) => {
 
 // create a new task
 app.post('/tasks', async (req, res) => {
-    const { list_id, title, completed, creator_id } = req.body;
+    const { list_id, title, completed, creator_id, created_date } = req.body;
     const id = uuidv4();
 
     try {
-        const newTask = await pool.query('INSERT INTO tasks(id, list_id, title, completed, creator_id) VALUES($1, $2, $3, $4, $5)', [id, list_id, title, completed, creator_id]);
+        const newTask = await pool.query('INSERT INTO tasks(id, list_id, title, completed, creator_id, created_date) VALUES($1, $2, $3, $4, $5, $6)', [id, list_id, title, completed, creator_id, created_date]);
         res.json(newTask);
     } catch (error) {
         console.error('Error creating task:', error);
@@ -137,8 +137,8 @@ app.put('/lists/:id', async (req, res) => {
     const { title, shared, color } = req.body
 
     try {
-        const editList = await pool.query('UPDATE tasks SET title = $1, shared = $2, color = $3 WHERE id = $3;', [title, shared, color, id]);
-        res.json(editTask);
+        const editList = await pool.query('UPDATE lists SET title = $1, shared = $2, color = $3 WHERE id = $4;', [title, shared, color, id]);
+        res.json(editList);
     } catch(error) {
         console.error('Error editing list:', error);
         res.status(500).send('Internal Server Error');
@@ -148,10 +148,10 @@ app.put('/lists/:id', async (req, res) => {
 // edit a task
 app.put('/tasks/:id', async (req, res) => {
     const { id } = req.params;
-    const { title, completed, last_edited_by } = req.body
+    const { title, last_edited_by, edited_date } = req.body
 
     try {
-        const editTask = await pool.query('UPDATE tasks SET title = $1, completed = $2, last_edited_by = $3 WHERE id = $4;', [title, completed, last_edited_by, id]);
+        const editTask = await pool.query('UPDATE tasks SET title = $1, last_edited_by = $2, edited_date = $3 WHERE id = $4;', [title, last_edited_by, edited_date, id]);
         res.json(editTask);
     } catch(error) {
         console.error('Error editing task:', error);
@@ -198,10 +198,10 @@ app.delete('/tasks/:id', async(req, res) => {
 
 // signup
 app.post('/signup', async(req, res) => {
-    const { id, email, name } = req.body;
+    const { id, email, name, color } = req.body;
 
     try {
-        const newUser = await pool.query('INSERT INTO users(id, email, name) VALUES($1, $2, $3)', [id, email, name]);
+        const newUser = await pool.query('INSERT INTO users(id, email, name, color) VALUES($1, $2, $3, $4)', [id, email, name, color]);
         res.json(newUser);
     } catch (error) {
         console.error('Error creating user:', error)

@@ -17,7 +17,8 @@ export const DataProvider = ({ children }) => {
                   listsJson.map(async (list) => {
                       const tasksResponse = await fetch(`${process.env.REACT_APP_SERVERURL}/tasks/${list.id}`)
                       const tasksJson = await tasksResponse.json();
-                      return { ...list, tasks: tasksJson };
+                      const sortedTasks = tasksJson.sort((a, b) => new Date(a.created_date) - new Date(b.created_date)); // Sort tasks by date
+                      return { ...list, tasks: sortedTasks };
                   }));
               setLists(listsWithTasks);
           } catch (error) {
@@ -39,7 +40,8 @@ export const DataProvider = ({ children }) => {
                     sharedListsJson.map(async (sharedList) => {
                         const tasksResponse = await fetch(`${process.env.REACT_APP_SERVERURL}/tasks/${sharedList.id}`);
                         const tasksJson = await tasksResponse.json();
-                        return { ...sharedList, tasks: tasksJson };
+                        const sortedTasks = tasksJson.sort((a, b) => new Date(a.created_date) - new Date(b.created_date)); // Sort tasks by date
+                        return { ...sharedList, tasks: sortedTasks };
                 }));
                 setSharedLists(sharedListsWithTasks);
             } catch (error) {

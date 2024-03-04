@@ -16,6 +16,7 @@ const AddTask = ({ list }) => {
         title: '',
         completed: false,
         creator_id: user.uid,
+        created_date: null,
         last_edited_by: null
     });
 
@@ -41,8 +42,14 @@ const AddTask = ({ list }) => {
 
             const newTask = await response.json();
             console.log('New task created:', newTask);
-            getLists();
             getSharedLists();
+            getLists();
+
+            setTaskData(taskData => ({
+                ...taskData,
+                title: ''
+            }))
+
         } catch(error) {
             console.error('Error creating task:', error.message);
             throw error;
@@ -54,9 +61,9 @@ const AddTask = ({ list }) => {
 
         setTaskData(taskData => ({
             ...taskData,
+            created_date: new Date(),
             title: value
         }))
-        console.log(taskData)
     }
 
     return (

@@ -4,43 +4,16 @@ import { useCookies } from 'react-cookie';
 import { DataContext } from '../contexts/DataContext';
 import { UserContext } from '../contexts/UserContext';
 
-const TaskModal = ({ mode, setShowModal, task, list }) => {
-    const editMode = mode === 'edit' ? true : false
+const TaskModal = ({ setShowModal, task, list }) => {
     const { getLists, getSharedLists } = useContext(DataContext);
     const { user } = useContext(UserContext);
 
     const [taskData, setTaskData] = useState({
-        list_id: editMode ? task.list_id : list.id,
-        title: editMode ? task.title : '',
-        completed: editMode ? task.completed : false,
-        creator_id: editMode ? task.creator_id : user.uid,
-        last_edited_by: editMode ? user.uid : null
+        list_id: task.list_id,
+        title: task.title,
+        last_edited_by: user.uid,
+        edited_date: new Date()
     });
-
-    const postTaskData = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await fetch(`${process.env.REACT_APP_SERVERURL}/tasks`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(taskData)
-            });
-            if (!response.ok) {
-                throw new Error('Failed to create task');
-            }
-
-            const newTask = await response.json();
-            console.log('New task created:', newTask);
-            setShowModal(false);
-            getLists();
-            getSharedLists();
-        } catch(error) {
-            console.error('Error creating task:', error.message);
-            throw error;
-        }
-    };
 
     const editTaskData = async(e) => {
         e.preventDefault();
@@ -67,6 +40,22 @@ const TaskModal = ({ mode, setShowModal, task, list }) => {
         }
     }
 
+    const deleteTask = async () => {
+        try {
+          const response = await fetch(`${process.env.REACT_APP_SERVERURL}/tasks/${task.id}`, {
+            method: 'DELETE'
+          });
+          if (response.ok) {
+            getLists();
+            getSharedLists();
+          } else {
+            console.error(`Error deleting task: ${response.statusText}`);
+          }
+        } catch (error) {
+          console.error('Error deleting task:', error);
+        }
+    }
+
     const handleChange = (e) => {
         console.log("changing!", e)
         const { value } = e.target
@@ -82,7 +71,7 @@ const TaskModal = ({ mode, setShowModal, task, list }) => {
         <div className="overlay">
             <div className="modal">
                 <div className="form-title-container">
-                    <h3>{mode} your task!</h3>
+                    <h3>Edit your task!</h3>
                     <button onClick={() => setShowModal(false)}>X</button>
                 </div>
 
@@ -96,7 +85,8 @@ const TaskModal = ({ mode, setShowModal, task, list }) => {
                         onChange={handleChange}
                     />
                     <br />
-                    <input type="submit" onClick={editMode ? editTaskData : postTaskData}/>
+                    <input type="submit" onClick={editTaskData}/>
+                    <button className="delete" onClick={deleteTask}>DELETE</button>
                 </form>
             </div>
         </div>

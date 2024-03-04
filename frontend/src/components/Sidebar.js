@@ -9,10 +9,21 @@ import { SidebarContainer, SidebarListsContainer, ListButton, Header, AddListBut
 const Sidebar = ({ selectedList, setSelectedList }) => {
     const [showModal, setShowModal] = useState(false) // controls the state of the modal object
     const { lists, sharedLists } = useContext(DataContext);
+    
   return (
     <>
     <SidebarContainer>
         <AddListButton onClick={() => setShowModal(true)}>Create List</AddListButton>
+
+        <SidebarListsContainer>
+            <ListButton 
+                onClick={() => setSelectedList(null)}
+                isSelected={!selectedList}
+                color='#2d7dfc'
+                >
+                    Dashboard
+            </ListButton>
+        </SidebarListsContainer>
 
         {lists && lists.length > 0 && (
             <>
@@ -23,6 +34,7 @@ const Sidebar = ({ selectedList, setSelectedList }) => {
                             key={list.id} 
                             onClick={() => setSelectedList(list)}
                             isSelected={selectedList && list.id === selectedList.id}
+                            color={list.color}
                         >
                             { list.title }
                     </ListButton>
@@ -33,13 +45,14 @@ const Sidebar = ({ selectedList, setSelectedList }) => {
 
         {sharedLists && sharedLists.length > 0 && (
             <>
-                <Header>Shared Lists</Header>
+                <Header>Shared With Me</Header>
                 <SidebarListsContainer>
                     {sharedLists.map((sharedList) => 
                         <ListButton
                             key={sharedList.id} 
                             onClick={() => setSelectedList(sharedList)}
                             isSelected={selectedList && sharedList.id === selectedList.id}
+                            color={sharedList.color}
                         >
                             { sharedList.title }
                     </ListButton>

@@ -10,6 +10,7 @@ export const ListTitle = styled.h1`
     font-weight: 600;
     font-size: 35px;
     margin: 0;
+    color: ${({ color }) => color};
 `;
 
 export const ListDetails = styled.h2`
@@ -38,20 +39,26 @@ export const HeaderContainer = styled.div`
 
 export const TaskListContainer = styled.div`
     padding-left: 30px;
+    padding-right: 50px;
+`;
+
+export const TasksContainer = styled.div`
+    padding-top: 20px;
 `;
 
 export const EditListButton = styled.button`
-    background-color: #efedf7;
+    background-color: #f2f2f2;
     height: 35px;
     width: 35px;
     border: none;
     border-radius: 50%;
     font-size: 15px;
-    color: #312857;
+    color: #2d7dfc;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 
     &:hover {
-        background-color: #312857;
+        background-color: #2d7dfc;
         color: white;
     }
 `;

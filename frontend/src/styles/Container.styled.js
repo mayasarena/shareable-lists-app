@@ -29,24 +29,36 @@ export const AuthContainer = styled.div`
 
 export const AppContainer = styled.div`
     display: flex;
-    background-color: pink;
     width: 100vw;
     height: 100vh;
 `;
 
 export const ContentContainer = styled.div`
-    background-color: white;
+    background-color: ${({ backgroundcolor }) => backgroundcolor};
     width: 100%;
-    padding: 20px;
 `;
 
 export const HeaderContainer = styled.div`
     display: flex;
     justify-content: space-between;
+    background-color: #fff;
     border-bottom: 1px solid #ededed;
+    align-items: center;
+    font-size: 25px;
+    font-weight: 600;
+    padding: 20px 50px 20px 50px;
 `;
 
 export const ButtonContainer = styled.div`
     display: flex;
     gap: 1rem;
+`;
+
+export const DashboardContainer = styled.div`
+    display: flex;
+    width: 100%;
+    gap: 20px;
+    padding: 40px;
+    flex-wrap: wrap;
+    justify-content: left;
 `;

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const Form = styled.form`
-    background-color: #eee;
+    background-color: #f2f2f2;
     display: flex;
     align-items: center;
     border: none;
@@ -10,7 +10,7 @@ export const Form = styled.form`
 `;
 
 export const TextInput = styled.input`
-    background-color: #eee;
+    background-color: #f2f2f2;
     display: flex;
     align-items: center;
     border: none;
@@ -32,6 +32,8 @@ export const ButtonInput = styled.input`
     border: none;
     border-radius: 0px 25px 25px 0px;
     margin: 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 
     &:hover {
         background-color: white;
