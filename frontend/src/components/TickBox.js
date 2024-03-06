@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { CheckboxContainer, Checkmark } from '../styles/TickBox.styled';
 import { DataContext } from '../contexts/DataContext';
 
@@ -7,6 +7,9 @@ const TickBox = ({ list, task, margin }) => {
   const [isChecked, setIsChecked] = useState(task.completed);
   const { getLists, getSharedLists } = useContext(DataContext);
 
+  useEffect(() => {
+    setIsChecked(task.completed);
+  }, [task]);
 
   const updateCompleted = async (e) => {
     try {

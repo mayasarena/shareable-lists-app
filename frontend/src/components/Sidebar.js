@@ -4,21 +4,41 @@ import { UserContext } from '../contexts/UserContext';
 import ListModal from './ListModal';
 import { useState } from 'react';
 import { DataContext } from '../contexts/DataContext';
-import { SidebarContainer, SidebarListsContainer, ListButton, Header, AddListButton } from '../styles/Sidebar.styled.js';
+import { SidebarContainer, SidebarListsContainer, ListButton, Header, AddListButton, ToggleButton, ToggleButtonContainer } from '../styles/Sidebar.styled.js';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons'; 
 
-const Sidebar = ({ selectedList, setSelectedList }) => {
+const Sidebar = ({ selectedList, setSelectedList, isOpen, setIsOpen, setOpenProfile, openProfile }) => {
     const [showModal, setShowModal] = useState(false) // controls the state of the modal object
     const { lists, sharedLists } = useContext(DataContext);
+
+    const toggleSidebar = () => {
+        setIsOpen(!isOpen);
+    }
     
   return (
     <>
-    <SidebarContainer>
-        <AddListButton onClick={() => setShowModal(true)}>Create List</AddListButton>
+    <SidebarContainer isOpen={isOpen}>
+        <ToggleButtonContainer>
+            <ToggleButton onClick={toggleSidebar}>
+                <FontAwesomeIcon icon={faXmark} />
+            </ToggleButton>
+        </ToggleButtonContainer>
+        <AddListButton onClick={() => {
+            setShowModal(true);
+            setIsOpen(!isOpen);
+        }}>
+            Create List
+        </AddListButton>
 
         <SidebarListsContainer>
             <ListButton 
-                onClick={() => setSelectedList(null)}
-                isSelected={!selectedList}
+                onClick={() => {
+                    setSelectedList(null);
+                    setIsOpen(!isOpen);
+                    setOpenProfile(false);
+                }}
+                isSelected={!selectedList && !openProfile}
                 color='#2d7dfc'
                 >
                     Dashboard
@@ -32,7 +52,10 @@ const Sidebar = ({ selectedList, setSelectedList }) => {
                     {lists.map((list) => 
                         <ListButton
                             key={list.id} 
-                            onClick={() => setSelectedList(list)}
+                            onClick={() => {
+                                setSelectedList(list);
+                                setIsOpen(!isOpen);
+                            }}
                             isSelected={selectedList && list.id === selectedList.id}
                             color={list.color}
                         >
@@ -50,7 +73,10 @@ const Sidebar = ({ selectedList, setSelectedList }) => {
                     {sharedLists.map((sharedList) => 
                         <ListButton
                             key={sharedList.id} 
-                            onClick={() => setSelectedList(sharedList)}
+                            onClick={() => {
+                                setSelectedList(sharedList);
+                                setIsOpen(!isOpen);
+                            }}
                             isSelected={selectedList && sharedList.id === selectedList.id}
                             color={sharedList.color}
                         >

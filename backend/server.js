@@ -1,18 +1,89 @@
-const PORT = process.env.PORT ?? 8000
-const express = require('express')
-const { v4: uuidv4 } = require('uuid')
-const cors = require('cors')
-const app = express()
-const pool = require('./database')
+const PORT = process.env.PORT || 8000; // Use default port 8000 if port environment not set
+const express = require('express');
+const { v4: uuidv4 } = require('uuid');
+const cors = require('cors');
+const pool = require('./database');
 const admin = require('firebase-admin');
+const socketIO = require('socket.io');
+const http = require('http');
 
-app.use(cors())
-app.use(express.json())
+const app = express();
+const server = http.createServer(app);
+const io = socketIO(server, {
+    cors: {
+      origin: 'http://localhost:3000', // Allow requests from this origin
+      methods: ['GET', 'POST'], // Allow these HTTP methods
+      credentials: true // Allow credentials (cookies, authorization headers, etc.)
+    }
+  });
+
+app.use(cors());
+app.use(express.json());
 admin.initializeApp();
+
+// Mapping of list IDs to connected users
+const listUsersMap = new Map();
+
+io.on('connection', (socket) => {
+    console.log('Client connected.');
+
+    // Listen for users joining a list
+    socket.on('joinList', (listId) => {
+        socket.join(listId);
+        if (!listUsersMap.has(listId)) {
+            listUsersMap.set(listId, new Set());
+        }
+        listUsersMap.get(listId).add(socket.id);
+    });
+
+    // Listen for users leaving a list
+    socket.on('leaveList', (listId) => {
+        socket.leave(listId);
+        if (listUsersMap.has(listId)) {
+            listUsersMap.get(listId).delete(socket.id);
+            if (listUsersMap.get(listId).size === 0) {
+                listUsersMap.delete(listId);
+            }
+        }
+    });
+
+    // More listeners for other database events...
+
+    socket.on('disconnect', () => {
+        console.log('Client disconnected.');
+        // Clean up user's association with lists upon disconnect
+        for (const [listId, users] of listUsersMap.entries()) {
+            if (users.has(socket.id)) {
+                users.delete(socket.id);
+                if (users.size === 0) {
+                    listUsersMap.delete(listId);
+                }
+                break; // Exit loop after removing from the first list
+            }
+        }
+    });
+});
 
 app.get('/', (req, res) => {
     res.send('hello!')
 })
+
+// Event listeners for database events
+pool.on('listUpdated', async (listID) => {
+    try {
+        io.to(listID).emit('listUpdated');
+    } catch (error) {
+        console.error('Error emitting listUpdated event:', error);
+    }
+});
+
+pool.on('listDeleted', async (listID) => {
+    try {
+        io.to(listID).emit('listDeleted');
+    } catch (error) {
+        console.error('Error emitting listDeleted event:', error);
+    }
+});
 
 // get lists
 app.get('/lists/:userID', async (req, res) => {
@@ -124,6 +195,8 @@ app.post('/tasks', async (req, res) => {
 
     try {
         const newTask = await pool.query('INSERT INTO tasks(id, list_id, title, completed, creator_id, created_date) VALUES($1, $2, $3, $4, $5, $6)', [id, list_id, title, completed, creator_id, created_date]);
+        // Emit the taskCreated event after successful insertion
+        io.emit('listUpdated');
         res.json(newTask);
     } catch (error) {
         console.error('Error creating task:', error);
@@ -138,6 +211,7 @@ app.put('/lists/:id', async (req, res) => {
 
     try {
         const editList = await pool.query('UPDATE lists SET title = $1, shared = $2, color = $3 WHERE id = $4;', [title, shared, color, id]);
+        io.emit('listUpdated');
         res.json(editList);
     } catch(error) {
         console.error('Error editing list:', error);
@@ -152,6 +226,7 @@ app.put('/tasks/:id', async (req, res) => {
 
     try {
         const editTask = await pool.query('UPDATE tasks SET title = $1, last_edited_by = $2, edited_date = $3 WHERE id = $4;', [title, last_edited_by, edited_date, id]);
+        io.emit('listUpdated');
         res.json(editTask);
     } catch(error) {
         console.error('Error editing task:', error);
@@ -165,6 +240,7 @@ app.put('/tasks/:id/completed', async (req, res) => {
     const { completed } = req.body
     try {
         const editTask = await pool.query('UPDATE tasks SET completed = $1 WHERE id = $2;', [completed, id]);
+        io.emit('listUpdated');
         res.json(editTask);
     } catch(error) {
         console.error('Error editing task:', error);
@@ -177,6 +253,7 @@ app.delete('/lists/:id', async(req, res) => {
     const { id } = req.params
     try {
         const deleteList = await pool.query('DELETE FROM lists WHERE id = $1;', [id]);
+        io.emit('listDeleted');
         res.json(deleteList)
     } catch (error) {
         console.error('Error deleting list:', error);
@@ -189,6 +266,7 @@ app.delete('/tasks/:id', async(req, res) => {
     const { id } = req.params
     try {
         const deleteTask = await pool.query('DELETE FROM tasks WHERE id = $1;', [id]);
+        io.emit('listUpdated');
         res.json(deleteTask)
     } catch (error) {
         console.error('Error deleting task:', error);
@@ -239,4 +317,6 @@ app.get('/users/email/:email', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}!`)
+});

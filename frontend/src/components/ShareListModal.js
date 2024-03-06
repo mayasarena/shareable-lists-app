@@ -2,6 +2,8 @@ import React from 'react';
 import { useState, useContext, useEffect } from 'react';
 import { DataContext } from '../contexts/DataContext';
 import { UserContext } from '../contexts/UserContext';
+import { Overlay, Modal, TitleContainer, CancelButton, Title, Option, Form, Input, SubmitButton, SubmitButtonContainer, Message } from '../styles/Modal.styled';
+
 
 // The modal sharing a list
 const ShareListModal = ({ setShowModal, list }) => {
@@ -83,18 +85,16 @@ const ShareListModal = ({ setShowModal, list }) => {
     };
 
     return (
-        <div className="overlay">
-            <div className="modal">
-                <div className="form-title-container">
-                    <h3>Share your list</h3>
-                    <button onClick={() => {
-                        setShowModal(false);
-                        setMessage('');
-                    }}>X</button>
-                </div>
+        <Overlay>
+            <Modal>
+                <TitleContainer>
+                    <Title>Share your list</Title>
+                </TitleContainer>
 
-                <form>
-                    <input 
+                <Form>
+                    <Option>
+                    Email:
+                    <Input 
                         required 
                         type="email"
                         placeholder="share with (email)" 
@@ -102,12 +102,20 @@ const ShareListModal = ({ setShowModal, list }) => {
                         value={sharedUserEmail} 
                         onChange={handleChange}
                     />
-                    <br />
-                    {message && <p className="">{message}</p>}
-                    <input type="submit" onClick={fetchUserFromEmail}/>
-                </form>
-            </div>
-        </div>
+                    </Option>
+                    {message && <Message>{message}</Message>}
+                    <SubmitButtonContainer>
+                        <CancelButton onClick={() => {
+                            setShowModal(false);
+                            setMessage('');
+                        }}>
+                            Cancel
+                        </CancelButton>
+                        <SubmitButton type="submit" value="Share" onClick={fetchUserFromEmail} />
+                    </SubmitButtonContainer>
+                </Form>
+            </Modal>
+        </Overlay>
     );
 };
 

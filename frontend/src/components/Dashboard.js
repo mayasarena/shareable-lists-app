@@ -9,7 +9,7 @@ const Dashboard = ({ setSelectedList} ) => {
     
     return (
         <ResponsiveMasonry
-            columnsCountBreakPoints={{350: 1, 750: 2, 900: 3}}
+            columnsCountBreakPoints={{350: 1, 500: 2, 1300: 3}}
         >
             <Masonry>
                 {lists && lists.map(list => (

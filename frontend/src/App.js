@@ -9,11 +9,14 @@ import { DataContext } from './contexts/DataContext';
 import { UserContext } from './contexts/UserContext';
 import { AppContainer, CenteredContainer, ContentContainer, DashboardContainer } from './styles/Container.styled';
 import Dashboard from './components/Dashboard';
+import Profile from './components/Profile';
 
 const App = () => {
   const { user } = useContext(UserContext);
   const [selectedList, setSelectedList] = useState(null);
   const { lists, sharedLists, getLists, getSharedLists } = useContext(DataContext);
+  const [isOpen, setIsOpen] = useState(false);
+  const [openProfile, setOpenProfile] = useState(false);
 
   const allLists = [...(lists || []), ...(sharedLists || [])];
 
@@ -28,6 +31,10 @@ const App = () => {
     }
   }, [lists, selectedList, sharedLists]);
 
+  useEffect(() => {
+    console.log('open profile', openProfile);
+  }, [openProfile]);
+
   return (
     <>
       {!user && 
@@ -37,15 +44,19 @@ const App = () => {
       }
       {user && (
         <AppContainer>
-        <Sidebar selectedList={selectedList} setSelectedList={setSelectedList} />
+        <Sidebar selectedList={selectedList} setSelectedList={setSelectedList} isOpen={isOpen} setIsOpen={setIsOpen} openProfile={openProfile} setOpenProfile={setOpenProfile}/>
         <ContentContainer backgroundcolor={selectedList ? '#fff' : '#f2f2f2'}>
-          <Header />
-          {selectedList ? (
-            <TaskList key={selectedList.id} list={selectedList} tasks={selectedList.tasks} />
-          ) : (
+          <Header setSelectedList={setSelectedList} isOpen={isOpen} setIsOpen={setIsOpen} setOpenProfile={setOpenProfile}/>
+          {selectedList && (
+            <TaskList key={selectedList.id} list={selectedList} tasks={selectedList.tasks} setSelectedList={setSelectedList} />
+          )}
+          {!selectedList && !openProfile && (
             <DashboardContainer>
               <Dashboard setSelectedList={setSelectedList}/>
             </DashboardContainer>
+          )}
+          {openProfile && (
+            <Profile />
           )}
         </ContentContainer>
       </AppContainer>

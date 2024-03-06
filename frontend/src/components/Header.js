@@ -2,9 +2,12 @@ import React from 'react';
 import { useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { ButtonContainer, HeaderContainer } from '../styles/Container.styled';
-import { SignOutButton } from '../styles/Button.styled';
+import { ProfileButton, SignOutButton } from '../styles/Button.styled';
+import { ToggleButton, ToggleHeaderContainer } from '../styles/Sidebar.styled';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBars } from '@fortawesome/free-solid-svg-icons'; 
 
-const Header = () => {
+const Header = ({ setSelectedList, isOpen, setIsOpen, setOpenProfile }) => {
   const { user, logout } = useContext(UserContext);
 
   const handleLogout = async () => {
@@ -12,10 +15,25 @@ const Header = () => {
     logout();
   };
 
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  }
+
+  const openProfile = () => {
+    setOpenProfile(true);
+    setSelectedList(null);
+  }
+
   return (
     <HeaderContainer>
-        Hello, {user.displayName}
+      <ToggleHeaderContainer>
+        <ToggleButton onClick={toggleSidebar}>
+            <FontAwesomeIcon icon={faBars} />
+          </ToggleButton>
+          Hello, {user.displayName}
+      </ToggleHeaderContainer>
         <ButtonContainer>
+            <ProfileButton onClick={openProfile}>Profile</ProfileButton>
             <SignOutButton onClick={handleLogout}>Signout</SignOutButton>
         </ButtonContainer>
     </HeaderContainer>

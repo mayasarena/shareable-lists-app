@@ -149,3 +149,10 @@ export const TextContainer = styled.div`
     display: flex;
     gap: 5px;
 `;
+
+export const Message = styled.h2`
+    font-size: 14px;
+    font-weight: 400;
+    text-align: center;
+    margin: 0;
+`;

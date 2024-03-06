@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import ReactTimeAgo from 'react-time-ago';
 
-const TaskListItem = ({ list, task}) => {
+const TaskListItem = ({ list, task }) => {
   const [showModal, setShowModal] = useState(false)
   const { getLists, getSharedLists } = useContext(DataContext);
   const { user } = useContext(UserContext);

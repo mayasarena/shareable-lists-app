@@ -6,14 +6,18 @@ import ShareListModal from './ShareListModal';
 import { useState, useEffect } from 'react';
 import TaskListItem from './TaskListItem';
 import { UserContext } from '../contexts/UserContext';
+import { DataContext } from '../contexts/DataContext';
 import { useContext } from 'react';
 import { ListTitle, TaskListContainer, ListDetails, TitleContainer, HeaderContainer, ListTitleContainer, EditListButton, TasksContainer } from '../styles/TaskList.styled';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import AddTask from './AddTask';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:8000');
 
 // TaskList displays all of the tasks in a given list
-const TaskList = ({ list, tasks }) => {
+const TaskList = ({ list, tasks, setSelectedList }) => {
   const [showTaskModal, setShowTaskModal] = useState(false); // controls the state of the task modal object
   const [showListModal, setShowListModal] = useState(false); // controls the state of the list modal object
   const { user } = useContext(UserContext);
@@ -21,6 +25,7 @@ const TaskList = ({ list, tasks }) => {
     email: null,
     name: null
   });
+  const { getLists, getSharedLists } = useContext(DataContext);
 
   const fetchUserData = async () => {
     try {
@@ -41,7 +46,43 @@ const TaskList = ({ list, tasks }) => {
 
   useEffect(() => {
     fetchUserData();
+    // Join list upon component mount
+    socket.emit('joinList', list.id);
+
+    // Leave the list upon component unmount
+    return () => {
+      socket.emit('leaveList', list.id);
+    };
   }, [list]);
+
+  useEffect(() => {
+    socket.on('listUpdated', () => {
+      console.log('This list has been updated');
+      // update state, perform actions here
+      if (user.uid === list.owner_id) {
+        getLists();
+      } else {
+        getSharedLists();
+      }
+    });
+
+    socket.on('listDeleted', () => {
+      console.log('This list has been deleted');
+      // update state, perform actions here
+      setSelectedList(null);
+      if (user.uid === list.owner_id) {
+        getLists();
+      } else {
+        getSharedLists();
+      }
+    });
+
+    // Clean up event listener
+    return () => {
+      socket.off('listUpdated');
+      socket.off('listDeleted');
+    };
+  }, []);
 
   return (
     <TaskListContainer>
