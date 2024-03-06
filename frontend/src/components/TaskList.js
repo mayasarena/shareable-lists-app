@@ -14,7 +14,7 @@ import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import AddTask from './AddTask';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:8000');
+const socket = io(process.env.REACT_APP_SERVERURL);
 
 // TaskList displays all of the tasks in a given list
 const TaskList = ({ list, tasks, setSelectedList }) => {

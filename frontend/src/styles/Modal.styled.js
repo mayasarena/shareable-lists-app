@@ -18,6 +18,7 @@ export const Modal = styled.div`
     background-color: white;
     padding:30px;
     border-radius: 10px;
+    margin: 20px;
 `;
 
 export const TitleContainer = styled.div`

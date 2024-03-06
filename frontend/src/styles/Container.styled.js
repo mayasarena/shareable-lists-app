@@ -9,24 +9,6 @@ export const CenteredContainer = styled.div`
     background-color: #f9f9f9;
 `;
 
-export const AuthContainer = styled.div`
-    width: 600px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-
-    /* Media query for medium-sized screens */
-    @media (min-width: 769px) and (max-width: 1024px) {
-        width: 60vw; /* Set width to 70% of the viewport width for medium-sized screens */
-    }
-
-    /* Media query for mobile screens */
-    @media (max-width: 768px) {
-        width: 80vw; /* Set width to 90% of the viewport width for mobile screens */
-    }
-`;
-
 export const AppContainer = styled.div`
     display: flex;
     width: 100vw;

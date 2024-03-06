@@ -64,9 +64,16 @@ io.on('connection', (socket) => {
     });
 });
 
-app.get('/', (req, res) => {
-    res.send('hello!')
-})
+app.get('/testdbconnection', async (req, res) => {
+    try {
+        // Attempt to query a sample table to test the database connection
+        const result = await pool.query('SELECT 1');
+        res.status(200).send('Database connection successful!');
+    } catch (error) {
+        console.error('Error connecting to database:', error);
+        res.status(500).send('Error connecting to database!');
+    }
+});
 
 // Event listeners for database events
 pool.on('listUpdated', async (listID) => {
@@ -287,6 +294,20 @@ app.post('/signup', async(req, res) => {
     }
 });
 
+// edit a user profile
+app.put('/users/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name, color } = req.body
+
+    try {
+        const editUser = await pool.query('UPDATE users SET name = $1, color = $2 WHERE id = $3;', [name, color, id]);
+        res.json(editUser);
+    } catch(error) {
+        console.error('Error editing user:', error);
+        res.status(500).send('Internal Server Error');
+    }
+})
+
 // fetch user from id
 app.get('/users/:userID', async (req, res) => {
     const { userID } = req.params;
@@ -317,6 +338,13 @@ app.get('/users/email/:email', async (req, res) => {
     }
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
     console.log(`Server running on port ${PORT}!`)
+
+    try {
+        const result = await pool.query('SELECT 1');
+        console.log('Database connection successful!');
+    } catch (e) {
+        console.error('Error connectging to db:', e)
+    }
 });

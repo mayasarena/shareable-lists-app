@@ -2,8 +2,9 @@ import React from 'react';
 import { useState } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 import { auth } from '../firebase';
-import { AuthContainer } from '../styles/Container.styled';
-import { ColorButton, ColorButtonSelected } from '../styles/ColorButtons.styled';
+import { ColorButton, ColorButtonSelected, ColorOptionsContainer } from '../styles/ColorButtons.styled';
+import { AuthContainer, Button, ButtonContainer, Form, Option, OptionTitle, SubmitButton, Title } from '../styles/AuthForm.styled';
+import { Input } from '../styles/Modal.styled';
 
 const AuthForm = () => {
   const [isLogIn, setIsLogIn] = useState(true);
@@ -79,43 +80,58 @@ const AuthForm = () => {
 
   return (
     <AuthContainer>
-      <form onSubmit={isLogIn ? logIn : signUp}>
-        {isLogIn ? <h1>Login</h1> : <h1>Sign up</h1>}
-        {!isLogIn && <input type="text" placeholder="Enter your name" value={displayName} onChange={(e) => setDisplayName(e.target.value)}></input>}
+      <ButtonContainer>
+        <Button onClick={() => viewLogIn(true)} isSelected={isLogIn} border={'10px 0px 0px 0px'}>Log in</Button>
+        <Button onClick={() => viewLogIn(false)} isSelected={!isLogIn} border={'0px 10px 0px 0px'}>Sign up</Button>
+      </ButtonContainer>
+      <Form onSubmit={isLogIn ? logIn : signUp}>
+          {!isLogIn && 
+            <Option>
+              <OptionTitle>Name:</OptionTitle>
+              <Input type="text" placeholder="Enter your name" value={displayName} onChange={(e) => setDisplayName(e.target.value)}></Input>
+            </Option>
+          }
         {!isLogIn && (
-          <>
-            <p>Select a color:</p>
-            <div>
-              {userColors.map(color => (
-                color === selectedColor ? ( 
-                  <ColorButtonSelected
+            <Option>
+              <OptionTitle>Icon Color:</OptionTitle>
+              <ColorOptionsContainer>
+                {userColors.map(color => (
+                  color === selectedColor ? ( 
+                    <ColorButtonSelected
+                      key={color}
+                      color={color}
+                      onClick={() => setSelectedColor(color)}
+                      style={{ backgroundColor: color }}
+                    />
+                  ) : (
+                    <ColorButton
                     key={color}
                     color={color}
                     onClick={() => setSelectedColor(color)}
                     style={{ backgroundColor: color }}
-                  />
-                ) : (
-                  <ColorButton
-                  key={color}
-                  color={color}
-                  onClick={() => setSelectedColor(color)}
-                  style={{ backgroundColor: color }}
-                  />
-                )
-              ))}
-            </div>
-          </>
+                    />
+                  )
+                ))}
+              </ColorOptionsContainer>
+            </Option>
         )}
-        <input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)}></input>
-        <input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)}></input>'
-        {!isLogIn && <input type="password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}></input>}
-        <button type='submit'>{isLogIn ? 'Log in' : 'Sign up'}</button>
+        <Option>
+          <OptionTitle>Email:</OptionTitle>
+          <Input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)}></Input>
+        </Option>
+        <Option>
+          <OptionTitle>Password:</OptionTitle>
+          <Input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)}></Input>
+        </Option>
+        {!isLogIn && 
+          <Option>
+            <OptionTitle>Re-type Password:</OptionTitle>
+            <Input type="password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}></Input>
+          </Option>
+        }
+        <SubmitButton type='submit'>{isLogIn ? 'Log in' : 'Sign up'}</SubmitButton>
         {error && <div>{error}</div>}
-      </form>
-      <div>
-        <button onClick={() => viewLogIn(false)}>Sign Up</button>
-        <button onClick={() => viewLogIn(true)}>Log in</button>
-      </div>
+      </Form>
     </AuthContainer>
   )
 };

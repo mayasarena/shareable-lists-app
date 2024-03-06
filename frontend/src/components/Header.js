@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { ButtonContainer, HeaderContainer } from '../styles/Container.styled';
@@ -34,7 +34,7 @@ const Header = ({ setSelectedList, isOpen, setIsOpen, setOpenProfile }) => {
       </ToggleHeaderContainer>
         <ButtonContainer>
             <ProfileButton onClick={openProfile}>Profile</ProfileButton>
-            <SignOutButton onClick={handleLogout}>Signout</SignOutButton>
+            <SignOutButton onClick={handleLogout}>Sign Out</SignOutButton>
         </ButtonContainer>
     </HeaderContainer>
   );

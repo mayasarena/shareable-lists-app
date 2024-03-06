@@ -2,7 +2,7 @@ import React from 'react';
 import { useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import ListModal from './ListModal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DataContext } from '../contexts/DataContext';
 import { SidebarContainer, SidebarListsContainer, ListButton, Header, AddListButton, ToggleButton, ToggleButtonContainer } from '../styles/Sidebar.styled.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,12 +10,12 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 const Sidebar = ({ selectedList, setSelectedList, isOpen, setIsOpen, setOpenProfile, openProfile }) => {
     const [showModal, setShowModal] = useState(false) // controls the state of the modal object
-    const { lists, sharedLists } = useContext(DataContext);
+    const { getLists, getSharedLists, lists, sharedLists } = useContext(DataContext);
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     }
-    
+
   return (
     <>
     <SidebarContainer isOpen={isOpen}>

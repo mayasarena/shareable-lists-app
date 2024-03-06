@@ -7,6 +7,6 @@ const pool = new Pool({
     host: process.env.HOST,
     post: process.env.DBPORT,
     database: 'tasks'
-})
+});
 
 module.exports = pool;
