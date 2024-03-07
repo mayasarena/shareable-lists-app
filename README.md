@@ -7,7 +7,7 @@ Welcome to the Shareable Lists App, a web application for managing lists. This r
 - **Task Management**: Add, edit, delete, and mark tasks as completed within lists.
 - **List Sharing**: Share lists with other users by email or username.
 - **Real-time Updates**: Utilize WebSockets to receive real-time updates on list modifications.
-- 
+
 
 ## Technologies Used
 
