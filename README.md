@@ -63,3 +63,10 @@ To get a local copy up and running, follow these simple steps.
    cd frontend
    npm start
 3. Navigate in your browser to wherever the frontend development server was deployed (http://localhost:####)
+
+   ## GIFs of App Functionality
+   
+![gif1](https://github.com/mayasarena/shareable-lists-app/assets/42900077/50b4ad61-322a-489c-8928-86dcb38d2ff3)
+![gif2](https://github.com/mayasarena/shareable-lists-app/assets/42900077/5ca46c14-e0ba-4b59-a9af-f9b6e90b0f52)
+![gif3](https://github.com/mayasarena/shareable-lists-app/assets/42900077/eeb04fbd-7a3f-4c99-a90d-1caa5949474e)
+
