@@ -8,10 +8,13 @@ import { SidebarContainer, SidebarListsContainer, ListButton, Header, AddListBut
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons'; 
 
+// Sidebar component
 const Sidebar = ({ selectedList, setSelectedList, isOpen, setIsOpen, setOpenProfile, openProfile }) => {
-    const [showModal, setShowModal] = useState(false) // controls the state of the modal object
-    const { getLists, getSharedLists, lists, sharedLists } = useContext(DataContext);
+    const [showModal, setShowModal] = useState(false) // State to control the visibility of the modal
+    const { getLists, getSharedLists, lists, sharedLists } = useContext(DataContext); // Accessing lists and shared lists from DataContext
+    const { user } = useContext(UserContext); // Accessing user data from UserContext
 
+    // Function to toggle the sidebar visibility
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     }
@@ -19,11 +22,13 @@ const Sidebar = ({ selectedList, setSelectedList, isOpen, setIsOpen, setOpenProf
   return (
     <>
     <SidebarContainer isOpen={isOpen}>
+        {/* Toggle button to close the sidebar */}
         <ToggleButtonContainer>
             <ToggleButton onClick={toggleSidebar}>
                 <FontAwesomeIcon icon={faXmark} />
             </ToggleButton>
         </ToggleButtonContainer>
+        {/* Button to open modal for creating a new list */}
         <AddListButton onClick={() => {
             setShowModal(true);
             setIsOpen(!isOpen);
@@ -31,6 +36,7 @@ const Sidebar = ({ selectedList, setSelectedList, isOpen, setIsOpen, setOpenProf
             Create List
         </AddListButton>
 
+        {/* Dashboard button */}
         <SidebarListsContainer>
             <ListButton 
                 onClick={() => {
@@ -45,6 +51,7 @@ const Sidebar = ({ selectedList, setSelectedList, isOpen, setIsOpen, setOpenProf
             </ListButton>
         </SidebarListsContainer>
 
+        {/* Display user's lists */}
         {lists && lists.length > 0 && (
             <>
                 <Header>Your Lists</Header>
@@ -66,6 +73,7 @@ const Sidebar = ({ selectedList, setSelectedList, isOpen, setIsOpen, setOpenProf
             </>
         )}
 
+        {/* Display lists shared with the user */}
         {sharedLists && sharedLists.length > 0 && (
             <>
                 <Header>Shared With Me</Header>
@@ -87,6 +95,7 @@ const Sidebar = ({ selectedList, setSelectedList, isOpen, setIsOpen, setOpenProf
             </>
         )}
     </SidebarContainer>
+    {/* Render the ListModal if showModal is true */}
     {showModal && <ListModal mode='create' setShowModal={setShowModal} />}
     </>
   );

@@ -5,10 +5,12 @@ import ShareListModal from './ShareListModal';
 import { UserContext } from '../contexts/UserContext';
 
 const ShareList = ({ list }) => {
-    const [showShareListModal, setShowShareListModal] = useState(false); // controls the state of the list modal object
+    // State variables for controlling modal and shared users
+    const [showShareListModal, setShowShareListModal] = useState(false);
     const [sharedUsers, setSharedUsers] = useState(null);
-    const { user } = useContext(UserContext);
+    const { user } = useContext(UserContext); // Access user data from UserContext
     
+    // Function to fetch shared users of the list from the server
     const fetchSharedUsers = async () => {
         try {
             const response = await fetch(`${process.env.REACT_APP_SERVERURL}/shared_lists/${list.id}/users`);
@@ -21,28 +23,26 @@ const ShareList = ({ list }) => {
         }
     };
 
+    // Fetch shared users when the list changes
     useEffect(() => {
         fetchSharedUsers();
     }, [list]);
 
+    // Predefined background and text colors for user icons
     const backgroundColors = ['#ccfab1', '#f7bece', '#f4d4ff', '#ccffed', '#bbc1fc', '#ffe0bf', '#ebebeb']
     const textColors = ['#4fb05f', '#b53147', '#7e2f99', '#2c8565', '#3d46a1', '#c77a28', '#b0b0b0']
 
-    const getRandomColor = () => {
-        const randomIndex = Math.floor(Math.random() * backgroundColors.length);
-        return backgroundColors[randomIndex];
-    };
-
-    // Function to select a predetermined text color for contrast
+    // Function to select a predetermined text color for contrast based on the background color
     const getTextColor = (backgroundColor) => {
         const index = backgroundColors.indexOf(backgroundColor);
         return textColors[index];
     };
 
+    // Render the ShareList component
     return (
         <ShareListContainer>
+            {/* Map through shared users and render user icons */}
             {sharedUsers?.map((user) => {
-                const randomColor = getRandomColor();
                 return (
                     <UserIcon 
                         key={user.id} 
@@ -54,12 +54,15 @@ const ShareList = ({ list }) => {
                     </UserIcon>
                 );
             })}
+            {/* Render share button if the current user is the owner of the list */}
             {(list.owner_id === user.uid) && (
                 <ShareButton onClick={() => setShowShareListModal(true)}>Share</ShareButton>
             )}
+            {/* Render ShareListModal component if showShareListModal is true */}
             {showShareListModal && <ShareListModal setShowModal={setShowShareListModal} list={list} />}
         </ShareListContainer>
   );
 }
+
 
 export default ShareList;

@@ -7,12 +7,18 @@ import { Overlay, Modal, TitleContainer, CancelButton, Title, Option, Form, Inpu
 
 // The modal for editing or adding a list
 const ListModal = ({ mode, setShowModal, list }) => {
-    const editMode = mode === 'edit' ? true : false
+    // Determine if the modal is in edit mode
+    const editMode = mode === 'edit' ? true : false;
+    // Access functions to get lists from the DataContext
     const { getLists } = useContext(DataContext);
+    // Access user data from the UserContext
     const { user } = useContext(UserContext);
+    // Initialize state variables
     const [selectedColor, setSelectedColor] = useState(list ? list.color : '');
+    // Array of predefined list colors
     const listColors = ['#f23a4d', '#f2843a', '#fcd049', '#0fb858', '#277be8', '#8f5cc4'];
 
+    // Initialize state for list data
     const [listData, setListData] = useState({
         owner_id: editMode ? list.owner_id : user.uid,
         title: editMode ? list.title : '',
@@ -38,15 +44,15 @@ const ListModal = ({ mode, setShowModal, list }) => {
             }
 
             const newList = await response.json();
-            console.log('New list created:', newList)
-            setShowModal(false)
-            getLists();
+            setShowModal(false);
+            getLists(); // Only getLists has to be called because users can only edit lists that they own
         } catch(error) {
             console.error('Error creating list:', error.message);
             throw error;
         }
     };
 
+    // Method for editing an existing list in the database
     const editListData = async(e) => {
         e.preventDefault();
         try {
@@ -62,7 +68,6 @@ const ListModal = ({ mode, setShowModal, list }) => {
             }
 
             const editedList = await response.json();
-            console.log('List edited:', editedList);
             setShowModal(false);
             getLists();
         } catch(error) {
@@ -71,6 +76,7 @@ const ListModal = ({ mode, setShowModal, list }) => {
         }
     }
 
+    // Method for deleting a list
     const deleteList = async () => {
         try {
           const response = await fetch(`${process.env.REACT_APP_SERVERURL}/lists/${list.id}`, {
@@ -86,6 +92,7 @@ const ListModal = ({ mode, setShowModal, list }) => {
         }
       }
 
+    // Handle changes in the list title input field
     const handleChange = (e) => {
         const { value } = e.target
 
@@ -96,6 +103,7 @@ const ListModal = ({ mode, setShowModal, list }) => {
         console.log(listData)
     };
 
+    // Effect to update list color in state when selected color changes
     useEffect(() => {
         console.log('selected color changed', selectedColor);
         if (selectedColor) {
@@ -106,55 +114,63 @@ const ListModal = ({ mode, setShowModal, list }) => {
         }
     }, [selectedColor]);
 
+    // Render the ListModal component
     return (
         <Overlay>
             <Modal>
                 <TitleContainer>
                     <Title>{mode} your list</Title>
                 </TitleContainer>
-                    <Form onSubmit={editMode ? editListData : postListData}>
-                        <Option>
-                            Name:
-                            <Input 
+                {/* Form for editing or adding a list */}
+                <Form onSubmit={editMode ? editListData : postListData}>
+                    <Option>
+                        Name:
+                        <Input 
                             required 
                             maxLength={30} 
                             placeholder="List name goes here" 
                             name="title"
                             value={listData.title} 
                             onChange={handleChange}
-                            />
-                        </Option>
-                        <Option>
-                            Color:
-                            <ColorOptionsContainer>
+                        />
+                    </Option>
+                    {/* Color options for the list */}
+                    <Option>
+                        Color:
+                        <ColorOptionsContainer>
+                            {/* Map through listColors array and render color buttons */}
                             {listColors.map(color => (
                                 color === selectedColor ? ( 
-                                <ColorButtonSelected
-                                    key={color}
-                                    color={color}
-                                    onClick={() => setSelectedColor(color)}
-                                    style={{ backgroundColor: color }}
-                                />
+                                    // Selected color button
+                                    <ColorButtonSelected
+                                        key={color}
+                                        color={color}
+                                        onClick={() => setSelectedColor(color)}
+                                        style={{ backgroundColor: color }}
+                                    />
                                 ) : (
-                                <ColorButton
-                                key={color}
-                                color={color}
-                                onClick={() => setSelectedColor(color)}
-                                style={{ backgroundColor: color }}
-                                />
+                                    // Unselected color button
+                                    <ColorButton
+                                        key={color}
+                                        color={color}
+                                        onClick={() => setSelectedColor(color)}
+                                        style={{ backgroundColor: color }}
+                                    />
                                 )
                             ))}
-                            </ColorOptionsContainer>
-                        </Option>
-                        <ButtonContainer>
-                            <DeleteButtonContainer>
-                                {editMode && <DeleteButton onClick={deleteList}>Delete</DeleteButton>}
-                            </DeleteButtonContainer>
-                            <SubmitButtonContainer>
-                                <CancelButton onClick={() => setShowModal(false)}>Cancel</CancelButton>
-                                <SubmitButton type="submit" value="Okay" />
-                            </SubmitButtonContainer>
-                        </ButtonContainer>
+                        </ColorOptionsContainer>
+                    </Option>
+                    {/* Container for delete and submit buttons */}
+                    <ButtonContainer>
+                        <DeleteButtonContainer>
+                            {/* Render delete button if in edit mode */}
+                            {editMode && <DeleteButton onClick={deleteList}>Delete</DeleteButton>}
+                        </DeleteButtonContainer>
+                        <SubmitButtonContainer>
+                            <CancelButton onClick={() => setShowModal(false)}>Cancel</CancelButton>
+                            <SubmitButton type="submit" value="Okay" />
+                        </SubmitButtonContainer>
+                    </ButtonContainer>
                 </Form>
             </Modal>
         </Overlay>

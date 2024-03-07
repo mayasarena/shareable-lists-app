@@ -6,15 +6,18 @@ import { ProfileContainer, UserIcon, Form, Option, Input, SubmitButton, Content,
 import { updateProfile } from "firebase/auth";
 
 const Profile = () => {
+  // Access user data from the UserContext
   const { user } = useContext(UserContext);
+  // State variables for user data and message
   const [userData, setUserData] = useState({
     name: null,
     color: null
-  })
+  });
   const [message, setMessage] = useState('');
 
-  const backgroundColors = ['#ccfab1', '#f7bece', '#f4d4ff', '#ccffed', '#bbc1fc', '#ffe0bf', '#ebebeb']
-  const textColors = ['#4fb05f', '#b53147', '#7e2f99', '#2c8565', '#3d46a1', '#c77a28', '#b0b0b0']
+  // Predefined background and text colors
+  const backgroundColors = ['#ccfab1', '#f7bece', '#f4d4ff', '#ccffed', '#bbc1fc', '#ffe0bf', '#ebebeb'];
+  const textColors = ['#4fb05f', '#b53147', '#7e2f99', '#2c8565', '#3d46a1', '#c77a28', '#b0b0b0'];
 
   // Function to select a predetermined text color for contrast
   const getTextColor = (backgroundColor) => {
@@ -22,6 +25,7 @@ const Profile = () => {
       return textColors[index];
   };
 
+  // Fetch user data from backend
   const fetchUserData = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_SERVERURL}/users/${user.uid}`);
@@ -39,6 +43,7 @@ const Profile = () => {
     }
   };
 
+  // Edit user data and update profile
   const editUserData = async(e) => {
     e.preventDefault();
     try {
@@ -59,7 +64,6 @@ const Profile = () => {
         }
 
         const editedUser = await response.json();
-        console.log('User edited:', editedUser);
         setMessage('Changes successfully saved.')
     } catch(error) {
         console.error('Error editing user:', error.message);
@@ -67,11 +71,12 @@ const Profile = () => {
     }
 }
 
+  // Fetch user data on component mount or when user changes
   useEffect(() => {
     fetchUserData();
-    console.log(userData);
   }, [user]);
 
+  // Handle changes in user display name
   const handleChange = (e) => {
     const { value } = e.target
 
@@ -81,17 +86,19 @@ const Profile = () => {
   }));
 };
 
+// Set selected color for user profile
 const setSelectedColor = (color) => {
   setUserData(userData => ({
     ...userData,
     color: color,
   }));
-  console.log(userData);
 }
 
+  // Render the Profile component
   return (  
     <ProfileContainer>
       <Content>
+      {/* Render user icon with background color and text color */}
       {userData.color && userData.name && (
       <UserIcon 
         key={user.id} 
@@ -104,6 +111,7 @@ const setSelectedColor = (color) => {
 
       <Email>{user.email}</Email>
 
+      {/* Form for editing user profile */}
       <Form>
         <Option>
         Display Name:
@@ -119,8 +127,10 @@ const setSelectedColor = (color) => {
         <Option>
         Color:
         <ColorOptionsContainer>
+        {/* Map through background colors and render color buttons */}
         {backgroundColors.map(color => (
             color === userData.color ? ( 
+            // Selected color button
             <ColorButtonSelected
                 key={color}
                 color={color}
@@ -128,6 +138,7 @@ const setSelectedColor = (color) => {
                 style={{ backgroundColor: color }}
             />
             ) : (
+            // Unselected color button
             <ColorButton
             key={color}
             color={color}
@@ -138,8 +149,10 @@ const setSelectedColor = (color) => {
         ))}
         </ColorOptionsContainer>
       </Option>
+        {/* Submit button for saving changes */}
         <SubmitButton type="submit" value="Save Changes" onClick={editUserData} />
       </Form>
+      {/* Display message indicating success or error */}
       <Message>{message}</Message>
       </Content>
     </ProfileContainer>

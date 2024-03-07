@@ -4,29 +4,31 @@ import { DataContext } from '../contexts/DataContext';
 import { UserContext } from '../contexts/UserContext';
 import { Overlay, Modal, TitleContainer, CancelButton, Title, Option, Form, Input, SubmitButton, SubmitButtonContainer, Message } from '../styles/Modal.styled';
 
-
-// The modal sharing a list
+// Modal component for sharing a list
 const ShareListModal = ({ setShowModal, list }) => {
-    const { getLists } = useContext(DataContext);
-    const [message, setMessage] = useState('');
-    const { user } = useContext(UserContext);
+    const { getLists } = useContext(DataContext); // Access method for updating lists
+    const [message, setMessage] = useState(''); // State variable for displaying messages
+    const { user } = useContext(UserContext); // Access user data from UserContext
 
-    const [sharedUserEmail, setSharedUserEmail] = useState('')
-    const [userId, setUserId] = useState(null)
+    const [sharedUserEmail, setSharedUserEmail] = useState(''); // State variable for the email of the user to share the list with
+    const [userId, setUserId] = useState(null); // State variable for the ID of the user to share the list with
 
+    // Effect hook to share the list when the user ID is set
     useEffect(() => {
         if (userId !== null) {
             shareList();
         }
     }, [userId]);
 
+    // Function to share the list with the user
     const shareList = async () => {
         try {
             if (userId === user.uid) {
-                setMessage(`You can't share a list with yourself...`);
-                return
+                setMessage(`You can't share a list with yourself...`); // Display error message if trying to share with oneself
+                return;
             }
 
+            // Add shared list to the database
             const sharedListResponse = await fetch(`${process.env.REACT_APP_SERVERURL}/shared_lists`, {
                 method: 'POST',
                 headers: {
@@ -39,8 +41,9 @@ const ShareListModal = ({ setShowModal, list }) => {
             });
             if (!sharedListResponse.ok) {
                 throw new Error('Failed to add shared list');
-            } 
+            }
 
+            // Update list to indicate it's shared
             const listResponse = await fetch(`${process.env.REACT_APP_SERVERURL}/lists/${list.id}/shared`, {
                 method: 'PUT',
                 headers: {
@@ -52,25 +55,23 @@ const ShareListModal = ({ setShowModal, list }) => {
             if (!listResponse.ok) {
                 throw new Error('Failed to update list');
             }
-
-            console.log('Shared list added successfully');
             setMessage('List successfully shared');
             setUserId(null);
-            getLists();
+            getLists(); // Refresh lists
 
         } catch (error) {
-            console.error('Error sharing list:', error);
-            setMessage(`Error sharing list: {error}`);
+            setMessage(`Error sharing list: ${error}`); // Display error message
         }
     };
 
+    // Function to fetch user ID from email
     const fetchUserFromEmail = async (e) => {
         e.preventDefault();
         try {
           const response = await fetch(`${process.env.REACT_APP_SERVERURL}/users/email/${sharedUserEmail}`);
           if (response.ok) {
             const userData = await response.json();
-            setUserId(userData.id);
+            setUserId(userData.id); // Set user ID if found
           } else {
             console.error('Error fetching user:', response.statusText);
           }
@@ -79,11 +80,13 @@ const ShareListModal = ({ setShowModal, list }) => {
         }
     };
 
+    // Function to handle change in the input field for the email
     const handleChange = (e) => {
-        const { value } = e.target
+        const { value } = e.target;
         setSharedUserEmail(value);
     };
 
+    // Render the ShareListModal component
     return (
         <Overlay>
             <Modal>
@@ -93,21 +96,22 @@ const ShareListModal = ({ setShowModal, list }) => {
 
                 <Form>
                     <Option>
-                    Email:
-                    <Input 
-                        required 
-                        type="email"
-                        placeholder="share with (email)" 
-                        name="email"
-                        value={sharedUserEmail} 
-                        onChange={handleChange}
-                    />
+                        Email:
+                        <Input 
+                            required 
+                            type="email"
+                            placeholder="share with (email)" 
+                            name="email"
+                            value={sharedUserEmail} 
+                            onChange={handleChange}
+                        />
                     </Option>
+                    {/* Display message if available */}
                     {message && <Message>{message}</Message>}
                     <SubmitButtonContainer>
                         <CancelButton onClick={() => {
-                            setShowModal(false);
-                            setMessage('');
+                            setShowModal(false); // Close the modal
+                            setMessage(''); // Clear message
                         }}>
                             Cancel
                         </CancelButton>

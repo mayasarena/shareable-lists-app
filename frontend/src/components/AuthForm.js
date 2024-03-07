@@ -16,87 +16,102 @@ const AuthForm = () => {
   const [selectedColor, setSelectedColor] = useState('');
   const userColors = ['#f7bece','#ffe0bf', '#ccfab1','#ccffed', '#bbc1fc', '#f4d4ff'];
 
-  const viewLogIn = (status) => {
-    setError(null);
-    setIsLogIn(status);
-  }
-
-  const logIn = async (e) => {
-    e.preventDefault();
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log(userCredential);
-      setError(null);
-    } catch (error) {
-      setError(error.message); // Set error message
-      console.error(error);
+    // Function to switch between login and signup views
+    const viewLogIn = (status) => {
+      setError(null); // Clear any existing errors
+      setIsLogIn(status); // Update the isLogIn state
     }
-  }
-
-  const signUp = async (e) => {
-    e.preventDefault();
-
-    if (password !== confirmPassword) {
-      setError('Make sure passwords match!')
-      return;
-    }
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      console.log(userCredential);
-
-      // Update user's profile with display name
-      await updateProfile(userCredential.user, {
-        displayName: displayName,
-      });
-
-      // Send user data to backend
-      const response = await fetch(`${process.env.REACT_APP_SERVERURL}/signup`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          id: userCredential.user.uid,
-          email: email,
-          name: displayName,
-          color: selectedColor
-        })
-      });
-      if (!response.ok) {
-          throw new Error('Failed to create user.');
+  
+    // Function to handle user login
+    const logIn = async (e) => {
+      e.preventDefault(); // Prevent default form submission behavior
+      try {
+        // Attempt to sign in the user with email and password
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log(userCredential);
+        setError(null); // Clear any existing errors
+      } catch (error) {
+        setError(error.message); // Set error message if login fails
+        console.error(error); // Log error to console
       }
-
-      setError(null);
-
-      // send email verification
-      //await sendEmailVerification(auth.currentUser);
-
-    } catch (error) {
-      setError(error.message);
-      console.error('Error signing up user:', error);
     }
-  }
-
-  return (
-    <AuthContainer>
-      <ButtonContainer>
-        <Button onClick={() => viewLogIn(true)} isSelected={isLogIn} border={'10px 0px 0px 0px'}>Log in</Button>
-        <Button onClick={() => viewLogIn(false)} isSelected={!isLogIn} border={'0px 10px 0px 0px'}>Sign up</Button>
-      </ButtonContainer>
-      <Form onSubmit={isLogIn ? logIn : signUp}>
+  
+    // Function to handle user signup
+    const signUp = async (e) => {
+      e.preventDefault(); // Prevent default form submission behavior
+  
+      // Check if passwords match
+      if (password !== confirmPassword) {
+        setError('Make sure passwords match!'); // Set error message
+        return;
+      }
+  
+      try {
+        // Create a new user with email and password
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        console.log(userCredential);
+  
+        // Update user's profile with display name
+        await updateProfile(userCredential.user, {
+          displayName: displayName,
+        });
+  
+        // Send user data to backend for further processing
+        const response = await fetch(`${process.env.REACT_APP_SERVERURL}/signup`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            id: userCredential.user.uid,
+            email: email,
+            name: displayName,
+            color: selectedColor
+          })
+        });
+        // Check if the request was successful
+        if (!response.ok) {
+            throw new Error('Failed to create user.');
+        }
+  
+        setError(null); // Clear any existing errors
+  
+        // send email verification
+        //await sendEmailVerification(auth.currentUser);
+  
+      } catch (error) {
+        setError(error.message); // Set error message if signup fails
+        console.error('Error signing up user:', error); // Log error to console
+      }
+    }
+  
+    // Render the AuthForm component
+    return (
+      <AuthContainer>
+        <ButtonContainer>
+          {/* Button to switch to login view */}
+          <Button onClick={() => viewLogIn(true)} isSelected={isLogIn} border={'10px 0px 0px 0px'}>Log in</Button>
+          {/* Button to switch to signup view */}
+          <Button onClick={() => viewLogIn(false)} isSelected={!isLogIn} border={'0px 10px 0px 0px'}>Sign up</Button>
+        </ButtonContainer>
+        {/* Form for login or signup */}
+        <Form onSubmit={isLogIn ? logIn : signUp}>
+          {/* Display input fields for signup only */}
           {!isLogIn && 
             <Option>
+              {/* Input field for user's display name */}
               <OptionTitle>Name:</OptionTitle>
               <Input type="text" placeholder="Enter your name" value={displayName} onChange={(e) => setDisplayName(e.target.value)}></Input>
             </Option>
           }
-        {!isLogIn && (
+          {/* Display color options for signup only */}
+          {!isLogIn && (
             <Option>
               <OptionTitle>Icon Color:</OptionTitle>
               <ColorOptionsContainer>
                 {userColors.map(color => (
                   color === selectedColor ? ( 
+                    // Selected color button
                     <ColorButtonSelected
                       key={color}
                       color={color}
@@ -104,36 +119,39 @@ const AuthForm = () => {
                       style={{ backgroundColor: color }}
                     />
                   ) : (
+                    // Unselected color button
                     <ColorButton
-                    key={color}
-                    color={color}
-                    onClick={() => setSelectedColor(color)}
-                    style={{ backgroundColor: color }}
+                      key={color}
+                      color={color}
+                      onClick={() => setSelectedColor(color)}
+                      style={{ backgroundColor: color }}
                     />
                   )
                 ))}
               </ColorOptionsContainer>
             </Option>
-        )}
-        <Option>
-          <OptionTitle>Email:</OptionTitle>
-          <Input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)}></Input>
-        </Option>
-        <Option>
-          <OptionTitle>Password:</OptionTitle>
-          <Input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)}></Input>
-        </Option>
-        {!isLogIn && 
+          )}
           <Option>
-            <OptionTitle>Re-type Password:</OptionTitle>
-            <Input type="password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}></Input>
+            <OptionTitle>Email:</OptionTitle>
+            <Input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)}></Input>
           </Option>
-        }
-        <SubmitButton type='submit'>{isLogIn ? 'Log in' : 'Sign up'}</SubmitButton>
-        {error && <div>{error}</div>}
-      </Form>
-    </AuthContainer>
-  )
-};
+          <Option>
+            <OptionTitle>Password:</OptionTitle>
+            <Input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)}></Input>
+          </Option>
+          {!isLogIn && 
+            <Option>
+              <OptionTitle>Re-type Password:</OptionTitle>
+              <Input type="password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}></Input>
+            </Option>
+          }
+          {/* Button to submit the form */}
+          <SubmitButton type='submit'>{isLogIn ? 'Log in' : 'Sign up'}</SubmitButton>
+          {/* Display error message if any */}
+          {error && <div>{error}</div>}
+        </Form>
+      </AuthContainer>
+    )
+  };
 
 export default AuthForm;

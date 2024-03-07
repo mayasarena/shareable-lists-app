@@ -14,19 +14,20 @@ import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import AddTask from './AddTask';
 import io from 'socket.io-client';
 
-const socket = io(process.env.REACT_APP_SERVERURL);
+const socket = io(process.env.REACT_APP_SERVERURL); // Initializing socket.io client with server URL
 
-// TaskList displays all of the tasks in a given list
+// TaskList component displays all of the tasks in a given list
 const TaskList = ({ list, tasks, setSelectedList }) => {
-  const [showTaskModal, setShowTaskModal] = useState(false); // controls the state of the task modal object
-  const [showListModal, setShowListModal] = useState(false); // controls the state of the list modal object
-  const { user } = useContext(UserContext);
-  const [ownerData, setOwnerData] = useState({
+  const [showTaskModal, setShowTaskModal] = useState(false); // State to control the visibility of the task modal
+  const [showListModal, setShowListModal] = useState(false); // State to control the visibility of the list modal
+  const { user } = useContext(UserContext); // Accessing user data from UserContext
+  const [ownerData, setOwnerData] = useState({ // State to store owner's data
     email: null,
     name: null
   });
-  const { getLists, getSharedLists } = useContext(DataContext);
+  const { getLists, getSharedLists } = useContext(DataContext); // Accessing functions to get lists and shared lists from DataContext
 
+  // Function to fetch list owner's data
   const fetchUserData = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_SERVERURL}/users/${list.owner_id}`);
@@ -45,20 +46,19 @@ const TaskList = ({ list, tasks, setSelectedList }) => {
   };
 
   useEffect(() => {
-    fetchUserData();
-    // Join list upon component mount
-    socket.emit('joinList', list.id);
+    fetchUserData(); // Fetch owner's data
+    socket.emit('joinList', list.id); // Join list upon component mount
 
-    // Leave the list upon component unmount
     return () => {
-      socket.emit('leaveList', list.id);
+      socket.emit('leaveList', list.id); // Leave the list upon component unmount
     };
-  }, [list]);
+  }, [list]); // Run useEffect when list changes
 
   useEffect(() => {
+    // Event listener for list updates
     socket.on('listUpdated', () => {
       console.log('This list has been updated');
-      // update state, perform actions here
+      // Update state and perform actions here based on whether the user is the owner or not
       if (user.uid === list.owner_id) {
         getLists();
       } else {
@@ -66,9 +66,10 @@ const TaskList = ({ list, tasks, setSelectedList }) => {
       }
     });
 
+    // Event listener for list deletion
     socket.on('listDeleted', () => {
       console.log('This list has been deleted');
-      // update state, perform actions here
+      // Update state and perform actions here based on whether the user is the owner or not
       setSelectedList(null);
       if (user.uid === list.owner_id) {
         getLists();
@@ -77,12 +78,12 @@ const TaskList = ({ list, tasks, setSelectedList }) => {
       }
     });
 
-    // Clean up event listener
+    // Cleanup event listeners
     return () => {
       socket.off('listUpdated');
       socket.off('listDeleted');
     };
-  }, []);
+  }, []); // Run useEffect only once when the component mounts
 
   return (
     <TaskListContainer>
@@ -105,7 +106,9 @@ const TaskList = ({ list, tasks, setSelectedList }) => {
         <AddTask list={list}/>
         <TasksContainer>
           {tasks?.map((task) => <TaskListItem key={task.id} list={list} task={task} />)}
+          {/* Task modal for creating or editing tasks */}
           {showTaskModal && <TaskModal mode={'create'} setShowModal={setShowTaskModal} list={list} />}
+          {/* List modal for editing lists */}
           {showListModal && <ListModal mode={'edit'} setShowModal={setShowListModal} list={list} />}
         </TasksContainer>
     </TaskListContainer>

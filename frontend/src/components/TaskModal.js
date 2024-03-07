@@ -6,17 +6,19 @@ import { Modal, Overlay, TitleContainer, Title, Form, Input, Option, ButtonConta
 import ReactTimeAgo from 'react-time-ago';
 import { UserIcon } from '../styles/ShareList.styled';
 
+// TaskModal component
 const TaskModal = ({ setShowModal, task, list, creatorData, editorData }) => {
-    const { getLists, getSharedLists } = useContext(DataContext);
-    const { user } = useContext(UserContext);
+    const { getLists, getSharedLists } = useContext(DataContext); // Accessing getLists and getSharedLists functions from DataContext
+    const { user } = useContext(UserContext); // Accessing user data from UserContext
 
-    const [taskData, setTaskData] = useState({
+    const [taskData, setTaskData] = useState({ // State for storing task data
         list_id: task.list_id,
         title: task.title,
         last_edited_by: user.uid,
         edited_date: new Date()
     });
 
+    // Function to edit task data
     const editTaskData = async(e) => {
         e.preventDefault();
         try {
@@ -42,6 +44,7 @@ const TaskModal = ({ setShowModal, task, list, creatorData, editorData }) => {
         }
     }
 
+    // Function to delete task
     const deleteTask = async () => {
         try {
           const response = await fetch(`${process.env.REACT_APP_SERVERURL}/tasks/${task.id}`, {
@@ -58,24 +61,24 @@ const TaskModal = ({ setShowModal, task, list, creatorData, editorData }) => {
         }
     }
 
+    // Function to handle input change
     const handleChange = (e) => {
-        console.log("changing!", e)
         const { value } = e.target
 
         setTaskData(taskData => ({
             ...taskData,
             title: value
         }))
-        console.log(taskData)
     }
 
     const backgroundColors = ['#ccfab1', '#f7bece', '#f4d4ff', '#ccffed', '#bbc1fc', '#ffe0bf', '#ebebeb']
     const textColors = ['#4fb05f', '#b53147', '#7e2f99', '#2c8565', '#3d46a1', '#c77a28', '#b0b0b0']
   
+    // Function to get text color based on background color
     const getTextColor = (backgroundColor) => {
       const index = backgroundColors.indexOf(backgroundColor);
       return textColors[index];
-  };
+    };
 
     return (
         <Overlay>
@@ -83,7 +86,9 @@ const TaskModal = ({ setShowModal, task, list, creatorData, editorData }) => {
                 <TitleContainer>
                     <Title>Edit your task</Title>
                 </TitleContainer>
+                {/* Container for creator and editor information */}
                 <InfoContainer>
+                    {/* Creator information */}
                     <Info>
                         <UserIcon 
                             backgroundcolor={creatorData.color ? creatorData.color : '#ebebeb'}
@@ -97,6 +102,7 @@ const TaskModal = ({ setShowModal, task, list, creatorData, editorData }) => {
                         Task created by {creatorData.email === user.email ? 'Me' : creatorData.email} ({creatorData.name}) <ReactTimeAgo date={task.created_date} local='en-US' />
                         </TextContainer>
                     </Info>
+                    {/* Editor information */}
                     {task.last_edited_by && editorData.name && (
                     <Info>
                         <UserIcon 
@@ -126,7 +132,7 @@ const TaskModal = ({ setShowModal, task, list, creatorData, editorData }) => {
                             onChange={handleChange}
                         />
                     </Option>
-
+                    {/* Buttons for deleting and submitting task */}
                     <ButtonContainer>
                         <DeleteButtonContainer>
                             <DeleteButton onClick={deleteTask}>Delete</DeleteButton>
