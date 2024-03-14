@@ -1,4 +1,4 @@
-# Study-Tracker
+# Shareable Lists App
 Welcome to the Shareable Lists App, a web application for managing lists. This repository contains both the frontend and backend components of the List App.
 
 ## Features
