@@ -1,5 +1,6 @@
 # Shareable Lists App
 Welcome to the Shareable Lists App, a web application for managing lists. This repository contains both the frontend and backend components of the List App.
+**Still a work in progress, I plan on adding more features!**
 
 ## Features
 Live updates of a list using socket.io:
